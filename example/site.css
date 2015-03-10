@@ -1,1 +1,8 @@
 body{padding:10px}.footer{height:50px}
+.popover form {
+    width: 100% !important;
+}
+
+.popover {
+    max-width: none !important;
+}

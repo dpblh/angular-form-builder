@@ -74,34 +74,69 @@ angular.module 'app', ['builder', 'builder.components', 'validator.rules']
     # ----------------------------------------
     # builder
     # ----------------------------------------
-    textbox = $builder.addFormObject 'default',
-        id: 'textbox'
-        component: 'textInput'
-        label: 'Name'
-        description: 'Your name'
-        placeholder: 'Your name'
-        required: yes
-        editable: no
-    checkbox = $builder.addFormObject 'default',
-        id: 'checkbox'
-        component: 'checkbox'
-        label: 'Pets'
-        description: 'Do you have any pets?'
-        options: ['Dog', 'Cat']
-    $builder.addFormObject 'default',
-        component: 'sampleInput'
-    # formObjects
-    $scope.form = $builder.forms['default']
 
-    # ----------------------------------------
-    # form
-    # ----------------------------------------
-    # user input value
-    $scope.input = []
-    $scope.defaultValue = {}
-    # formObjectId: default value
-    $scope.defaultValue[textbox.id] = 'default value'
-    $scope.defaultValue[checkbox.id] = [yes, yes]
+    $scope.generateIndex = (x, y) ->
+        x = x+1;
+        y = y+1;
+        if x != 1 && y == 1 then x+y else x*y
+
+
+    $scope.default = {};
+
+    $scope.rows = [
+        {
+            columns: [{
+                width: 6, formData: {
+                    inputs: [{"id":"example2","label":"Text Input2","value":"hello"}],
+                    name: "example",
+                    views: [{
+                        "id": "example2",
+                        "component": "textInput",
+                        "editable": true,
+                        "label": "Text Input2",
+                        "description": "description",
+                        "placeholder": "placeholder",
+                        "options": [],
+                        "required": false,
+                        "validation": "/.*/"
+                    }]
+                }
+            }, {
+                width: 6, formData: {
+                    inputs: [],
+                    name: "example",
+                    views: [{
+                        "id": "example3",
+                        "component": "textInput",
+                        "editable": true,
+                        "label": "Text Input2",
+                        "description": "description",
+                        "placeholder": "placeholder",
+                        "options": [],
+                        "required": false,
+                        "validation": "/.*/"
+                    }]
+                }
+            }]
+        }, {
+            columns: [{
+                width: 12, formData: {
+                    inputs: [],
+                    name: "example",
+                    views: [{
+                        "id": "example4",
+                        "component": "textInput",
+                        "editable": true,
+                        "label": "Text Input2",
+                        "description": "description",
+                        "placeholder": "placeholder",
+                        "options": [],
+                        "required": false,
+                        "validation": "/.*/"
+                    }]
+                }
+            }]
+        }];
 
     $scope.submit = ->
         $validator.validate $scope, 'default'

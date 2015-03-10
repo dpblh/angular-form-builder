@@ -177,12 +177,12 @@
       return {
         restrict: 'A',
         scope: {
-          fbBuilder: '='
+          fbBuilder: '=',
+          formName: '@'
         },
         template: "<div class='form-horizontal'>\n    <div class='fb-form-object-editable' ng-repeat=\"object in formObjects\"\n        fb-form-object-editable=\"object\"></div>\n</div>",
         link: function(scope, element, attrs) {
           var beginMove, _base, _name;
-          scope.formName = attrs.fbBuilder;
           if ((_base = $builder.forms)[_name = scope.formName] == null) {
             _base[_name] = [];
           }
@@ -242,17 +242,17 @@
               if (!isHover && draggable.mode === 'drag') {
                 formObject = draggable.object.formObject;
                 if (formObject.editable) {
-                  $builder.removeFormObject(attrs.fbBuilder, formObject.index);
+                  $builder.removeFormObject(scope.formName, formObject.index);
                 }
               } else if (isHover) {
                 if (draggable.mode === 'mirror') {
-                  $builder.insertFormObject(scope.formName, $(element).find('.empty').index('.fb-form-object-editable'), {
+                  $builder.insertFormObject(scope.formName, $(element).find('.empty').index(), {
                     component: draggable.object.componentName
                   });
                 }
                 if (draggable.mode === 'drag') {
                   oldIndex = draggable.object.formObject.index;
-                  newIndex = $(element).find('.empty').index('.fb-form-object-editable');
+                  newIndex = $(element).find('.empty').index();
                   if (oldIndex < newIndex) {
                     newIndex--;
                   }
@@ -280,6 +280,7 @@
         },
         link: function(scope, element) {
           var popover;
+          scope.formName = scope.$parent.formName;
           scope.inputArray = [];
           scope.$component = $builder.components[scope.formObject.component];
           scope.setupScope(scope.formObject);
@@ -453,6 +454,133 @@
         }
       };
     }
+  ]).directive('fbLayoutBuilder', [
+    '$builder', '$compile', function($builder, $compile) {
+      var fbLayoutBuilder;
+      fbLayoutBuilder = {
+        restrict: 'A',
+        scope: {
+          layout: '=fbLayoutBuilder'
+        },
+        template: "<div class=\"panel panel-default\" style='position: relative;'>\n    <div class=\"panel-heading\">\n        <h3 class=\"panel-title\">Builder</h3>\n    </div>\n\n    <div class=\"row\" ng-repeat=\"row in layout\">\n        <div class=\"col-md-{{column.width}}\" ng-repeat=\"column in row.columns\">\n            <div fb-builder=\"column.formData.views\" form-name=\"{{$parent.$index + '' + $index}}\"></div>\n        </div>\n    </div>\n</div>\n",
+        templatePopover: "<form role=\"form\" class='form-horizontal'>\n\n        <div class=\"form-group\" ng-repeat='row in layout'>\n            <label class='col-lg-1 control-label' ng-click=\"removeRow(row)\">x</label>\n            <div class='col-lg-11'>\n                <div class='col-lg-{{column.width}}' ng-repeat='column in row.columns'>\n                    <input type='text' class='form-control' ng-model='column.width'/>\n                    <label class='col-lg-1 control-label' ng-click='removeColumn(row, column)'>x</label>\n                </div>\n                <label class='btn btn-default' ng-click='addColumn(row)'>+</label>\n            </div>\n        </div>\n\n    <label class='btn btn-default' ng-click='addRow()'>+</label>\n</form>",
+        link: function(scope, element) {
+          var viewPopover;
+          viewPopover = $compile(fbLayoutBuilder.templatePopover)(scope);
+          $(element).popover({
+            html: true,
+            title: 'layout settings',
+            content: viewPopover,
+            container: 'body',
+            placement: 'right'
+          });
+          scope.showSettings = false;
+          scope.removeRow = function(row) {
+            return scope.layout.splice(scope.layout.indexOf(row), 1);
+          };
+          scope.removeColumn = function(row, column) {
+            return row.columns.splice(row.columns.indexOf(column), 1);
+          };
+          scope.addColumn = function(row) {
+            var indexColumn, indexRow;
+            indexRow = scope.layout.indexOf(row);
+            indexColumn = row.columns.length;
+            row.columns.push({
+              width: 12,
+              formData: {
+                inputs: [],
+                name: "example",
+                views: [
+                  {
+                    "component": "textInput",
+                    "editable": true,
+                    "index": 2,
+                    "label": "Text Input2",
+                    "description": "description",
+                    "placeholder": "placeholder",
+                    "options": [],
+                    "required": false,
+                    "validation": "/.*/"
+                  }
+                ]
+              }
+            });
+            return $builder.addAllFormObject("" + indexRow + indexColumn, scope.layout[indexRow].columns[indexColumn].formData.views);
+          };
+          return scope.addRow = function() {
+            var index;
+            index = scope.layout.length;
+            scope.layout.push({
+              columns: [
+                {
+                  width: 12,
+                  formData: {
+                    inputs: [],
+                    name: "example",
+                    views: [
+                      {
+                        "component": "textInput",
+                        "editable": true,
+                        "index": 2,
+                        "label": "Text Input2",
+                        "description": "description",
+                        "placeholder": "placeholder",
+                        "options": [],
+                        "required": false,
+                        "validation": "/.*/"
+                      }
+                    ]
+                  }
+                }
+              ]
+            });
+            return $builder.addAllFormObject("" + index + "0", scope.layout[index].columns[0].formData.views);
+          };
+        }
+      };
+      return fbLayoutBuilder;
+    }
+  ]).directive('fbLayout', [
+    '$builder', function($builder) {
+      return {
+        restrict: 'A',
+        scope: {
+          layout: '=fbLayout'
+        },
+        template: "<div class=\"row\" ng-repeat=\"row in layout\">\n    <div class=\"col-md-{{column.width}}\" ng-repeat=\"column in row.columns\">\n        <div ng-model=\"column.formData.inputs\" fb-form=\"{{$parent.$index + '' + $index}}\" fb-default=\"defaultValue[$parent.$index + '' + $index]\"></div>\n    </div>\n</div>",
+        link: function(scope) {
+          var column, i, input, j, row, _i, _len, _ref, _results;
+          scope.defaultValue = {};
+          _ref = scope.layout;
+          _results = [];
+          for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
+            row = _ref[i];
+            _results.push((function() {
+              var _j, _len1, _ref1, _results1;
+              _ref1 = row.columns;
+              _results1 = [];
+              for (j = _j = 0, _len1 = _ref1.length; _j < _len1; j = ++_j) {
+                column = _ref1[j];
+                $builder.addAllFormObject("" + i + j, column.formData.views);
+                scope.defaultValue["" + i + j] = {};
+                _results1.push((function() {
+                  var _k, _len2, _ref2, _results2;
+                  _ref2 = column.formData.inputs;
+                  _results2 = [];
+                  for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
+                    input = _ref2[_k];
+                    _results2.push(scope.defaultValue["" + i + j][input.id] = input.value);
+                  }
+                  return _results2;
+                })());
+              }
+              return _results1;
+            })());
+          }
+          return _results;
+        }
+      };
+    }
   ]).directive('fbForm', [
     '$injector', function($injector) {
       return {
@@ -528,7 +656,7 @@
           if (!scope.$component.arrayToText && scope.formObject.options.length > 0) {
             scope.inputText = scope.formObject.options[0];
           }
-          return scope.$watch("default['" + scope.formObject.id + "']", function(value) {
+          return scope.$watch("default." + scope.formObject.id, function(value) {
             if (!value) {
               return;
             }
@@ -833,6 +961,9 @@
             _ref = _this.data.droppables;
             for (id in _ref) {
               droppable = _ref[id];
+              if (!(droppable.element.contains(e.target))) {
+                continue;
+              }
               isHover = _this.isHover($element, $(droppable.element));
               droppable.up(e, isHover, result);
             }
@@ -974,7 +1105,10 @@
  */
 
 (function() {
-  var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+  var idCount,
+    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+
+  idCount = 0;
 
   angular.module('builder.provider', []).provider('$builder', function() {
     var $http, $injector, $templateCache;
@@ -1029,7 +1163,7 @@
         throw "The component " + formObject.component + " was not registered.";
       }
       result = {
-        id: formObject.id,
+        id: formObject.id || (idCount += 1),
         component: formObject.component,
         editable: (_ref = formObject.editable) != null ? _ref : component.editable,
         index: (_ref1 = formObject.index) != null ? _ref1 : 0,
@@ -1135,6 +1269,18 @@
         return _this.insertFormObject(name, _this.forms[name].length, formObject);
       };
     })(this);
+    this.addAllFormObject = (function(_this) {
+      return function(name, formObjects) {
+        if (formObjects == null) {
+          formObjects = [];
+        }
+
+        /*
+            does not work with raw data
+         */
+        return _this.forms[name] = formObjects;
+      };
+    })(this);
     this.insertFormObject = (function(_this) {
       return function(name, index, formObject) {
         var _base;
@@ -1223,6 +1369,7 @@
             broadcastChannel: _this.broadcastChannel,
             registerComponent: _this.registerComponent,
             addFormObject: _this.addFormObject,
+            addAllFormObject: _this.addAllFormObject,
             insertFormObject: _this.insertFormObject,
             removeFormObject: _this.removeFormObject,
             updateFormObjectIndex: _this.updateFormObjectIndex

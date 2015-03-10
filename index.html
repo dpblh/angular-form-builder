@@ -7,8 +7,11 @@
     <link type="text/css" rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"/>
     <link type="text/css" rel="stylesheet" href="example/site.css"/>
     <link type="text/css" rel="stylesheet" href="dist/angular-form-builder.css"/>
+    <link type="text/css" rel="stylesheet" href="bower_components/jquery-popover/jquery.popover.css"/>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
-    <script type="text/javascript" src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script src="bower_components/bootstrap/js/tooltip.js"></script>
+    <script src="bower_components/bootstrap/js/popover.js"></script>
+    <!--<script type="text/javascript" src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>-->
     <script type="text/javascript" src="//code.angularjs.org/1.2.20/angular.min.js"></script>
     <script type="text/javascript" src="dist/angular-form-builder.js"></script>
     <script type="text/javascript" src="dist/angular-form-builder-components.js"></script>
@@ -21,24 +24,13 @@
         <h1>angular-form-builder</h1>
         <hr/>
 
-        <div class="col-md-6">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Builder</h3>
-                </div>
-                <div fb-builder="default"></div>
-                <div class="panel-footer">
-                    <div class="checkbox">
-                        <label><input type="checkbox" ng-model="isShowScope" />
-                            Show scope
-                        </label>
-                    </div>
-                    <pre ng-if="isShowScope">{{form}}</pre>
-                </div>
-            </div>
+        <div class="col-md-8">
+
+                <div fb-layout-builder="rows"></div>
+
         </div>
 
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div fb-components></div>
         </div>
     </div>
@@ -47,7 +39,7 @@
         <h2>Form</h2>
         <hr/>
         <form class="form-horizontal">
-            <div ng-model="input" fb-form="default" fb-default="defaultValue"></div>
+            <div fb-layout="rows"></div>
             <div class="form-group">
                 <div class="col-md-8 col-md-offset-4">
                     <input type="submit" ng-click="submit()" class="btn btn-default"/>
@@ -59,7 +51,7 @@
                 Show scope
             </label>
         </div>
-        <pre ng-if="isShowScope">{{input}}</pre>
+        <pre ng-if="isShowScope">{{rows}}</pre>
     </div>
 
     <div class="row">

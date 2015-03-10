@@ -220,7 +220,7 @@ angular.module 'builder.drag', []
                 return
             @hooks.up.drag = (e) =>
                 # execute callback for droppables
-                for id, droppable of @data.droppables
+                for id, droppable of @data.droppables when droppable.element.contains e.target
                     isHover = @isHover $element, $(droppable.element)
                     droppable.up e, isHover, result
 

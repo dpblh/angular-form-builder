@@ -21,6 +21,7 @@ angular.module 'builder.directive', [
     restrict: 'A'
     scope:
         fbBuilder: '='
+        formName: '@'
     template:
         """
         <div class='form-horizontal'>
@@ -32,7 +33,6 @@ angular.module 'builder.directive', [
         # ----------------------------------------
         # valuables
         # ----------------------------------------
-        scope.formName = attrs.fbBuilder
         $builder.forms[scope.formName] ?= []
         scope.formObjects = $builder.forms[scope.formName]
         beginMove = yes
@@ -93,16 +93,16 @@ angular.module 'builder.directive', [
                     # remove the form object by draggin out
                     formObject = draggable.object.formObject
                     if formObject.editable
-                        $builder.removeFormObject attrs.fbBuilder, formObject.index
+                        $builder.removeFormObject scope.formName, formObject.index
                 else if isHover
                     if draggable.mode is 'mirror'
                         # insert a form object
-                        $builder.insertFormObject scope.formName, $(element).find('.empty').index('.fb-form-object-editable'),
+                        $builder.insertFormObject scope.formName, $(element).find('.empty').index(),
                             component: draggable.object.componentName
                     if draggable.mode is 'drag'
                         # update the index of form objects
                         oldIndex = draggable.object.formObject.index
-                        newIndex = $(element).find('.empty').index('.fb-form-object-editable')
+                        newIndex = $(element).find('.empty').index()
                         newIndex-- if oldIndex < newIndex
                         $builder.updateFormObjectIndex scope.formName, oldIndex, newIndex
                 $(element).find('.empty').remove()
@@ -123,6 +123,7 @@ angular.module 'builder.directive', [
     scope:
         formObject: '=fbFormObjectEditable'
     link: (scope, element) ->
+        scope.formName = scope.$parent.formName
         scope.inputArray = [] # just for fix warning
         # get component
         scope.$component = $builder.components[scope.formObject.component]
@@ -301,6 +302,140 @@ angular.module 'builder.directive', [
             $(element).html view
 ]
 
+# ----------------------------------------
+# fb-layout-builder
+# ----------------------------------------
+.directive 'fbLayoutBuilder', ['$builder', '$compile', ($builder, $compile) ->
+    fbLayoutBuilder =
+        restrict: 'A',
+        scope:
+            layout: '=fbLayoutBuilder'
+        template:
+            """
+            <div class="panel panel-default" style='position: relative;'>
+                <div class="panel-heading">
+                    <h3 class="panel-title">Builder</h3>
+                </div>
+
+                <div class="row" ng-repeat="row in layout">
+                    <div class="col-md-{{column.width}}" ng-repeat="column in row.columns">
+                        <div fb-builder="column.formData.views" form-name="{{$parent.$index + '' + $index}}"></div>
+                    </div>
+                </div>
+            </div>
+
+            """
+        templatePopover:
+            """
+            <form role="form" class='form-horizontal'>
+
+                    <div class="form-group" ng-repeat='row in layout'>
+                        <label class='col-lg-1 control-label' ng-click="removeRow(row)">x</label>
+                        <div class='col-lg-11'>
+                            <div class='col-lg-{{column.width}}' ng-repeat='column in row.columns'>
+                                <input type='text' class='form-control' ng-model='column.width'/>
+                                <label class='col-lg-1 control-label' ng-click='removeColumn(row, column)'>x</label>
+                            </div>
+                            <label class='btn btn-default' ng-click='addColumn(row)'>+</label>
+                        </div>
+                    </div>
+
+                <label class='btn btn-default' ng-click='addRow()'>+</label>
+            </form>
+            """
+        link: (scope, element) ->
+
+            viewPopover = $compile(fbLayoutBuilder.templatePopover) scope
+
+            $(element).popover
+                html: yes
+                title: 'layout settings'
+                content: viewPopover
+                container: 'body'
+                placement: 'right'
+
+            scope.showSettings = no
+
+            scope.removeRow = (row) ->
+                scope.layout.splice scope.layout.indexOf(row), 1
+
+            scope.removeColumn = (row, column) ->
+                row.columns.splice row.columns.indexOf(column), 1
+
+            scope.addColumn = (row) ->
+#                inputUuid = uuid()
+                indexRow = scope.layout.indexOf row
+                indexColumn = row.columns.length
+                row.columns.push
+                  width: 12, formData:
+                      inputs: [],
+                      name: "example",
+                      views: [{
+#                          "id": "input-#{inputUuid}",
+                          "component": "textInput",
+                          "editable": true,
+                          "index": 2,
+                          "label": "Text Input2",
+                          "description": "description",
+                          "placeholder": "placeholder",
+                          "options": [],
+                          "required": false,
+                          "validation": "/.*/"
+                      }]
+                $builder.addAllFormObject("#{indexRow}#{indexColumn}", scope.layout[indexRow].columns[indexColumn].formData.views)
+
+            scope.addRow = ->
+#                inputUuid = uuid()
+                index = scope.layout.length
+                scope.layout.push
+                    columns: [{
+                        width: 12, formData: {
+                            inputs: [],
+                            name: "example",
+                            views: [{
+#                                "id": "input-#{inputUuid}",
+                                "component": "textInput",
+                                "editable": true,
+                                "index": 2,
+                                "label": "Text Input2",
+                                "description": "description",
+                                "placeholder": "placeholder",
+                                "options": [],
+                                "required": false,
+                                "validation": "/.*/"
+                            }]
+                        }
+                    }]
+                $builder.addAllFormObject("#{index}0", scope.layout[index].columns[0].formData.views)
+    fbLayoutBuilder
+]
+
+
+.directive 'fbLayout', ['$builder', ($builder) ->
+
+    restrict: 'A'
+    scope:
+        layout: '=fbLayout'
+    template:
+        """
+        <div class="row" ng-repeat="row in layout">
+            <div class="col-md-{{column.width}}" ng-repeat="column in row.columns">
+                <div ng-model="column.formData.inputs" fb-form="{{$parent.$index + '' + $index}}" fb-default="defaultValue[$parent.$index + '' + $index]"></div>
+            </div>
+        </div>
+        """
+    link: (scope) ->
+
+        scope.defaultValue = {}
+
+        for row, i in scope.layout
+            for column, j in row.columns
+                $builder.addAllFormObject "#{i}#{j}", column.formData.views
+                scope.defaultValue["#{i}#{j}"] = {}
+                for input in column.formData.inputs
+                    scope.defaultValue["#{i}#{j}"][input.id] = input.value
+
+]
 
 # ----------------------------------------
 # fb-form
@@ -383,7 +518,7 @@ angular.module 'builder.directive', [
             scope.inputText = scope.formObject.options[0]
 
         # set default value
-        scope.$watch "default['#{scope.formObject.id}']", (value) ->
+        scope.$watch "default.#{scope.formObject.id}", (value) ->
             return if not value
             if scope.$component.arrayToText
                 scope.inputArray = value

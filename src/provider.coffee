@@ -10,6 +10,7 @@
         This is for end-user. There are form groups int the form.
         They can input the value to the form.
 ###
+idCount = 0
 
 angular.module 'builder.provider', []
 
@@ -64,7 +65,7 @@ angular.module 'builder.provider', []
         component = @components[formObject.component]
         throw "The component #{formObject.component} was not registered." if not component?
         result =
-            id: formObject.id
+            id: formObject.id || idCount+=1
             component: formObject.component
             editable: formObject.editable ? component.editable
             index: formObject.index ? 0
@@ -144,6 +145,12 @@ angular.module 'builder.provider', []
         @forms[name] ?= []
         @insertFormObject name, @forms[name].length, formObject
 
+    @addAllFormObject = (name, formObjects=[]) =>
+        ###
+            does not work with raw data
+        ###
+        @forms[name] = formObjects
+
     @insertFormObject = (name, index, formObject={}) =>
         ###
         Insert the form object into the form at {index}.
@@ -207,6 +214,7 @@ angular.module 'builder.provider', []
         broadcastChannel: @broadcastChannel
         registerComponent: @registerComponent
         addFormObject: @addFormObject
+        addAllFormObject: @addAllFormObject
         insertFormObject: @insertFormObject
         removeFormObject: @removeFormObject
         updateFormObjectIndex: @updateFormObjectIndex

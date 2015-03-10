@@ -30,16 +30,15 @@ module.exports = (grunt) ->
                     'dist/angular-form-builder-components.min.js': 'dist/angular-form-builder-components.js'
 
         watch:
+            options:
+                spawn: no
+#                livereload: yes
             compass:
                 files: ['example/*.scss', 'src/*.scss']
                 tasks: ['compass']
-                options:
-                    spawn: no
             coffee:
                 files: ['src/*.coffee', 'components/*.coffee', 'example/*.coffee']
                 tasks: ['coffee']
-                options:
-                    spawn: no
 
         connect:
             server:
@@ -48,6 +47,8 @@ module.exports = (grunt) ->
                     hostname: '*'
                     port: 8000
                     base: '.'
+#                    keepalive: yes
+#                    livereload: yes
 
         karma:
             min:
@@ -59,13 +60,13 @@ module.exports = (grunt) ->
     # register task
     # -----------------------------------
     grunt.registerTask 'dev', [
-        'compass'
+#        'compass'
         'coffee'
         'connect'
         'watch'
     ]
     grunt.registerTask 'build', [
-        'compass'
+#        'compass'
         'coffee'
         'uglify'
     ]
