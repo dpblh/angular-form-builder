@@ -4,6 +4,7 @@
 # ----------------------------------------
 angular.module 'builder.directive', [
     'builder.provider'
+    'builder.services'
     'builder.controller'
     'builder.drag'
     'validator'
@@ -305,7 +306,7 @@ angular.module 'builder.directive', [
 # ----------------------------------------
 # fb-layout-builder
 # ----------------------------------------
-.directive 'fbLayoutBuilder', ['$builder', '$compile', ($builder, $compile) ->
+.directive 'fbLayoutBuilder', ['$builder', '$compile', 'utils', ($builder, $compile, utils) ->
     fbLayoutBuilder =
         restrict: 'A',
         scope:
@@ -363,7 +364,6 @@ angular.module 'builder.directive', [
                 row.columns.splice row.columns.indexOf(column), 1
 
             scope.addColumn = (row) ->
-#                inputUuid = uuid()
                 indexRow = scope.layout.indexOf row
                 indexColumn = row.columns.length
                 row.columns.push
@@ -371,7 +371,7 @@ angular.module 'builder.directive', [
                       inputs: [],
                       name: "example",
                       views: [{
-#                          "id": "input-#{inputUuid}",
+                          "id": utils.guid(),
                           "component": "textInput",
                           "editable": true,
                           "index": 2,
@@ -385,7 +385,6 @@ angular.module 'builder.directive', [
                 $builder.addAllFormObject("#{indexRow}#{indexColumn}", scope.layout[indexRow].columns[indexColumn].formData.views)
 
             scope.addRow = ->
-#                inputUuid = uuid()
                 index = scope.layout.length
                 scope.layout.push
                     columns: [{
@@ -393,7 +392,7 @@ angular.module 'builder.directive', [
                             inputs: [],
                             name: "example",
                             views: [{
-#                                "id": "input-#{inputUuid}",
+                                "id": utils.guid(),
                                 "component": "textInput",
                                 "editable": true,
                                 "index": 2,
@@ -518,7 +517,7 @@ angular.module 'builder.directive', [
             scope.inputText = scope.formObject.options[0]
 
         # set default value
-        scope.$watch "default.#{scope.formObject.id}", (value) ->
+        scope.$watch "default['#{scope.formObject.id}']", (value) ->
             return if not value
             if scope.$component.arrayToText
                 scope.inputArray = value

@@ -169,7 +169,7 @@
 }).call(this);
 
 (function() {
-  angular.module('builder.directive', ['builder.provider', 'builder.controller', 'builder.drag', 'validator']).directive('fbBuilder', [
+  angular.module('builder.directive', ['builder.provider', 'builder.services', 'builder.controller', 'builder.drag', 'validator']).directive('fbBuilder', [
     '$injector', function($injector) {
       var $builder, $drag;
       $builder = $injector.get('$builder');
@@ -455,7 +455,7 @@
       };
     }
   ]).directive('fbLayoutBuilder', [
-    '$builder', '$compile', function($builder, $compile) {
+    '$builder', '$compile', 'utils', function($builder, $compile, utils) {
       var fbLayoutBuilder;
       fbLayoutBuilder = {
         restrict: 'A',
@@ -492,6 +492,7 @@
                 name: "example",
                 views: [
                   {
+                    "id": utils.guid(),
                     "component": "textInput",
                     "editable": true,
                     "index": 2,
@@ -519,6 +520,7 @@
                     name: "example",
                     views: [
                       {
+                        "id": utils.guid(),
                         "component": "textInput",
                         "editable": true,
                         "index": 2,
@@ -656,7 +658,7 @@
           if (!scope.$component.arrayToText && scope.formObject.options.length > 0) {
             scope.inputText = scope.formObject.options[0];
           }
-          return scope.$watch("default." + scope.formObject.id, function(value) {
+          return scope.$watch("default['" + scope.formObject.id + "']", function(value) {
             if (!value) {
               return;
             }
@@ -1105,16 +1107,14 @@
  */
 
 (function() {
-  var idCount,
-    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+  var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
-  idCount = 0;
-
-  angular.module('builder.provider', []).provider('$builder', function() {
-    var $http, $injector, $templateCache;
+  angular.module('builder.provider', ['builder.services']).provider('$builder', function() {
+    var $http, $injector, $templateCache, utils;
     $injector = null;
     $http = null;
     $templateCache = null;
+    utils = null;
     this.config = {
       popoverPlacement: 'right'
     };
@@ -1163,7 +1163,7 @@
         throw "The component " + formObject.component + " was not registered.";
       }
       result = {
-        id: formObject.id || (idCount += 1),
+        id: formObject.id || utils.guid(),
         component: formObject.component,
         editable: (_ref = formObject.editable) != null ? _ref : component.editable,
         index: (_ref1 = formObject.index) != null ? _ref1 : 0,
@@ -1189,7 +1189,8 @@
       return function(injector) {
         $injector = injector;
         $http = $injector.get('$http');
-        return $templateCache = $injector.get('$templateCache');
+        $templateCache = $injector.get('$templateCache');
+        return utils = $injector.get('utils');
       };
     })(this);
     this.loadTemplate = function(component) {
@@ -1378,5 +1379,27 @@
       })(this)
     ];
   });
+
+}).call(this);
+
+
+/*
+  utils service
+ */
+
+(function() {
+  angular.module('builder.services', []).factory('utils', [
+    function() {
+      return {
+        guid: function() {
+          var s4;
+          s4 = function() {
+            return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+          };
+          return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+        }
+      };
+    }
+  ]);
 
 }).call(this);

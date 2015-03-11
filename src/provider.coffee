@@ -10,14 +10,14 @@
         This is for end-user. There are form groups int the form.
         They can input the value to the form.
 ###
-idCount = 0
 
-angular.module 'builder.provider', []
+angular.module 'builder.provider', ['builder.services']
 
 .provider '$builder', ->
     $injector = null
     $http = null
     $templateCache = null
+    utils = null
 
     @config =
         popoverPlacement: 'right'
@@ -65,7 +65,7 @@ angular.module 'builder.provider', []
         component = @components[formObject.component]
         throw "The component #{formObject.component} was not registered." if not component?
         result =
-            id: formObject.id || idCount+=1
+            id: formObject.id || utils.guid()
             component: formObject.component
             editable: formObject.editable ? component.editable
             index: formObject.index ? 0
@@ -87,6 +87,7 @@ angular.module 'builder.provider', []
         $injector = injector
         $http = $injector.get '$http'
         $templateCache = $injector.get '$templateCache'
+        utils = $injector.get 'utils'
 
     @loadTemplate = (component) ->
         ###
