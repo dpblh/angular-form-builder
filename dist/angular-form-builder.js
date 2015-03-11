@@ -462,8 +462,8 @@
         scope: {
           layout: '=fbLayoutBuilder'
         },
-        template: "<div class=\"panel panel-default\" style='position: relative;'>\n    <div class=\"panel-heading\">\n        <h3 class=\"panel-title\">Builder</h3>\n    </div>\n\n    <div class=\"row\" ng-repeat=\"row in layout\">\n        <div class=\"col-md-{{column.width}}\" ng-repeat=\"column in row.columns\">\n            <div fb-builder=\"column.formData.views\" form-name=\"{{$parent.$index + '' + $index}}\"></div>\n        </div>\n    </div>\n</div>\n",
-        templatePopover: "<form role=\"form\" class='form-horizontal'>\n\n        <div class=\"form-group\" ng-repeat='row in layout'>\n            <label class='col-lg-1 control-label' ng-click=\"removeRow(row)\">x</label>\n            <div class='col-lg-11'>\n                <div class='col-lg-{{column.width}}' ng-repeat='column in row.columns'>\n                    <input type='text' class='form-control' ng-model='column.width'/>\n                    <label class='col-lg-1 control-label' ng-click='removeColumn(row, column)'>x</label>\n                </div>\n                <label class='btn btn-default' ng-click='addColumn(row)'>+</label>\n            </div>\n        </div>\n\n    <label class='btn btn-default' ng-click='addRow()'>+</label>\n</form>",
+        template: "<div class=\"panel panel-default\" style='position: relative;'>\n    <div class=\"panel-heading\">\n        <h3 class=\"panel-title\">Builder</h3>\n    </div>\n\n    <div class=\"row\" ng-repeat=\"row in layout.rows\">\n        <div class=\"col-md-{{column.width}}\" ng-repeat=\"column in row.columns\">\n            <div fb-builder=\"column.formData.views\" form-name=\"{{$parent.$index + '' + $index}}\"></div>\n        </div>\n    </div>\n</div>\n",
+        templatePopover: "<form role=\"form\" class='form-horizontal'>\n\n        <div class=\"form-group\" ng-repeat='row in layout.rows'>\n            <label class='col-lg-1 control-label' ng-click=\"removeRow(row)\">x</label>\n            <div class='col-lg-11'>\n                <div class='col-lg-{{column.width}}' ng-repeat='column in row.columns'>\n                    <input type='text' class='form-control' ng-model='column.width'/>\n                    <label class='col-lg-1 control-label' ng-click='removeColumn(row, column)'>x</label>\n                </div>\n                <label class='btn btn-default' ng-click='addColumn(row)'>+</label>\n            </div>\n        </div>\n\n    <label class='btn btn-default' ng-click='addRow()'>+</label>\n</form>",
         link: function(scope, element) {
           var viewPopover;
           viewPopover = $compile(fbLayoutBuilder.templatePopover)(scope);
@@ -476,14 +476,14 @@
           });
           scope.showSettings = false;
           scope.removeRow = function(row) {
-            return scope.layout.splice(scope.layout.indexOf(row), 1);
+            return scope.layout.rows.splice(scope.layout.rows.indexOf(row), 1);
           };
           scope.removeColumn = function(row, column) {
             return row.columns.splice(row.columns.indexOf(column), 1);
           };
           scope.addColumn = function(row) {
             var indexColumn, indexRow;
-            indexRow = scope.layout.indexOf(row);
+            indexRow = scope.layout.rows.indexOf(row);
             indexColumn = row.columns.length;
             row.columns.push({
               width: 12,
@@ -506,12 +506,12 @@
                 ]
               }
             });
-            return $builder.addAllFormObject("" + indexRow + indexColumn, scope.layout[indexRow].columns[indexColumn].formData.views);
+            return $builder.addAllFormObject("" + indexRow + indexColumn, scope.layout.rows[indexRow].columns[indexColumn].formData.views);
           };
           return scope.addRow = function() {
             var index;
-            index = scope.layout.length;
-            scope.layout.push({
+            index = scope.layout.rows.length;
+            scope.layout.rows.push({
               columns: [
                 {
                   width: 12,
@@ -536,7 +536,7 @@
                 }
               ]
             });
-            return $builder.addAllFormObject("" + index + "0", scope.layout[index].columns[0].formData.views);
+            return $builder.addAllFormObject("" + index + "0", scope.layout.rows[index].columns[0].formData.views);
           };
         }
       };
@@ -549,11 +549,11 @@
         scope: {
           layout: '=fbLayout'
         },
-        template: "<div class=\"row\" ng-repeat=\"row in layout\">\n    <div class=\"col-md-{{column.width}}\" ng-repeat=\"column in row.columns\">\n        <div ng-model=\"column.formData.inputs\" fb-form=\"{{$parent.$index + '' + $index}}\" fb-default=\"defaultValue[$parent.$index + '' + $index]\"></div>\n    </div>\n</div>",
+        template: "<div class=\"row\" ng-repeat=\"row in layout.rows\">\n    <div class=\"col-md-{{column.width}}\" ng-repeat=\"column in row.columns\">\n        <div ng-model=\"column.formData.inputs\" fb-form=\"{{$parent.$index + '' + $index}}\" fb-default=\"defaultValue[$parent.$index + '' + $index]\"></div>\n    </div>\n</div>",
         link: function(scope) {
           var column, i, input, j, row, _i, _len, _ref, _results;
           scope.defaultValue = {};
-          _ref = scope.layout;
+          _ref = scope.layout.rows;
           _results = [];
           for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
             row = _ref[i];

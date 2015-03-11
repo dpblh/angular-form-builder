@@ -75,68 +75,67 @@ angular.module 'app', ['builder', 'builder.components', 'validator.rules']
     # builder
     # ----------------------------------------
 
-    $scope.generateIndex = (x, y) ->
-        x = x+1;
-        y = y+1;
-        if x != 1 && y == 1 then x+y else x*y
-
 
     $scope.default = {};
 
-    $scope.rows = [
-        {
-            columns: [{
-                width: 6, formData: {
-                    inputs: [{"id":"example2","label":"Text Input2","value":"hello"}],
-                    name: "example",
-                    views: [{
-                        "id": "example2",
-                        "component": "textInput",
-                        "editable": true,
-                        "label": "Text Input2",
-                        "description": "description",
-                        "placeholder": "placeholder",
-                        "options": [],
-                        "required": false,
-                        "validation": "/.*/"
+    $scope.layout =
+        rows:
+            [
+                {
+                    columns: [{
+                        width: 6, formData: {
+                            inputs: [{"id": "example2", "label": "Text Input2", "value": "hello"}],
+                            name: "example",
+                            views: [{
+                                "id": "example2",
+                                "component": "textInput",
+                                "editable": true,
+                                "label": "Text Input2",
+                                "description": "description",
+                                "placeholder": "placeholder",
+                                "options": [],
+                                "required": false,
+                                "validation": "/.*/"
+                            }]
+                        }
+                    }, {
+                        width: 6, formData: {
+                            inputs: [],
+                            name: "example",
+                            views: [{
+                                "id": "example3",
+                                "component": "textInput",
+                                "editable": true,
+                                "label": "Text Input2",
+                                "description": "description",
+                                "placeholder": "placeholder",
+                                "options": [],
+                                "required": false,
+                                "validation": "/.*/"
+                            }]
+                        }
+                    }]
+                },
+                {
+                    columns: [{
+                        width: 12, formData: {
+                            inputs: [],
+                            name: "example",
+                            views: [{
+                                "id": "example4",
+                                "component": "textInput",
+                                "editable": true,
+                                "label": "Text Input2",
+                                "description": "description",
+                                "placeholder": "placeholder",
+                                "options": [],
+                                "required": false,
+                                "validation": "/.*/"
+                            }]
+                        }
                     }]
                 }
-            }, {
-                width: 6, formData: {
-                    inputs: [],
-                    name: "example",
-                    views: [{
-                        "id": "example3",
-                        "component": "textInput",
-                        "editable": true,
-                        "label": "Text Input2",
-                        "description": "description",
-                        "placeholder": "placeholder",
-                        "options": [],
-                        "required": false,
-                        "validation": "/.*/"
-                    }]
-                }
-            }]
-        }, {
-            columns: [{
-                width: 12, formData: {
-                    inputs: [],
-                    name: "example",
-                    views: [{
-                        "id": "example4",
-                        "component": "textInput",
-                        "editable": true,
-                        "label": "Text Input2",
-                        "description": "description",
-                        "placeholder": "placeholder",
-                        "options": [],
-                        "required": false,
-                        "validation": "/.*/"
-                    }]
-                }
-            }]
-        }];
+            ]
 
     $scope.submit = ->
         $validator.validate $scope, 'default'

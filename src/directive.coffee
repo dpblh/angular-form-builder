@@ -318,7 +318,7 @@ angular.module 'builder.directive', [
                     <h3 class="panel-title">Builder</h3>
                 </div>
 
-                <div class="row" ng-repeat="row in layout">
+                <div class="row" ng-repeat="row in layout.rows">
                     <div class="col-md-{{column.width}}" ng-repeat="column in row.columns">
                         <div fb-builder="column.formData.views" form-name="{{$parent.$index + '' + $index}}"></div>
                     </div>
@@ -330,7 +330,7 @@ angular.module 'builder.directive', [
             """
             <form role="form" class='form-horizontal'>
 
-                    <div class="form-group" ng-repeat='row in layout'>
+                    <div class="form-group" ng-repeat='row in layout.rows'>
                         <label class='col-lg-1 control-label' ng-click="removeRow(row)">x</label>
                         <div class='col-lg-11'>
                             <div class='col-lg-{{column.width}}' ng-repeat='column in row.columns'>
@@ -358,13 +358,13 @@ angular.module 'builder.directive', [
             scope.showSettings = no
 
             scope.removeRow = (row) ->
-                scope.layout.splice scope.layout.indexOf(row), 1
+                scope.layout.rows.splice scope.layout.rows.indexOf(row), 1
 
             scope.removeColumn = (row, column) ->
                 row.columns.splice row.columns.indexOf(column), 1
 
             scope.addColumn = (row) ->
-                indexRow = scope.layout.indexOf row
+                indexRow = scope.layout.rows.indexOf row
                 indexColumn = row.columns.length
                 row.columns.push
                   width: 12, formData:
@@ -382,11 +382,11 @@ angular.module 'builder.directive', [
                           "required": false,
                           "validation": "/.*/"
                       }]
-                $builder.addAllFormObject("#{indexRow}#{indexColumn}", scope.layout[indexRow].columns[indexColumn].formData.views)
+                $builder.addAllFormObject("#{indexRow}#{indexColumn}", scope.layout.rows[indexRow].columns[indexColumn].formData.views)
 
             scope.addRow = ->
-                index = scope.layout.length
-                scope.layout.push
+                index = scope.layout.rows.length
+                scope.layout.rows.push
                     columns: [{
                         width: 12, formData: {
                             inputs: [],
@@ -405,7 +405,7 @@ angular.module 'builder.directive', [
                             }]
                         }
                     }]
-                $builder.addAllFormObject("#{index}0", scope.layout[index].columns[0].formData.views)
+                $builder.addAllFormObject("#{index}0", scope.layout.rows[index].columns[0].formData.views)
     fbLayoutBuilder
 ]
 
@@ -417,7 +417,7 @@ angular.module 'builder.directive', [
         layout: '=fbLayout'
     template:
         """
-        <div class="row" ng-repeat="row in layout">
+        <div class="row" ng-repeat="row in layout.rows">
             <div class="col-md-{{column.width}}" ng-repeat="column in row.columns">
                 <div ng-model="column.formData.inputs" fb-form="{{$parent.$index + '' + $index}}" fb-default="defaultValue[$parent.$index + '' + $index]"></div>
             </div>
@@ -427,7 +427,7 @@ angular.module 'builder.directive', [
 
         scope.defaultValue = {}
 
-        for row, i in scope.layout
+        for row, i in scope.layout.rows
             for column, j in row.columns
                 $builder.addAllFormObject "#{i}#{j}", column.formData.views
                 scope.defaultValue["#{i}#{j}"] = {}
