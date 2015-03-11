@@ -117,6 +117,7 @@ angular.module 'builder.controller', ['builder.provider']
 
     # set default for input
     $scope.input ?= []
+    $scope.model ?= {}
     $scope.$watch 'form', ->
         # remove superfluous input
         if $scope.input.length > $scope.form.length
@@ -141,8 +142,11 @@ angular.module 'builder.controller', ['builder.provider']
     $scope.updateInput = (value) ->
         ###
         Copy current scope.input[X] to $parent.input.
+        Set model value
         @param value: The input value.
         ###
+        $scope.$parent.model[$scope.formObject.id] = value
+
         input =
             id: $scope.formObject.id
             label: $scope.formObject.label

@@ -133,6 +133,9 @@
       if ($scope.input == null) {
         $scope.input = [];
       }
+      if ($scope.model == null) {
+        $scope.model = {};
+      }
       return $scope.$watch('form', function() {
         if ($scope.input.length > $scope.form.length) {
           $scope.input.splice($scope.form.length);
@@ -153,9 +156,11 @@
 
         /*
         Copy current scope.input[X] to $parent.input.
+        Set model value
         @param value: The input value.
          */
         var input;
+        $scope.$parent.model[$scope.formObject.id] = value;
         input = {
           id: $scope.formObject.id,
           label: $scope.formObject.label,
@@ -547,12 +552,16 @@
       return {
         restrict: 'A',
         scope: {
-          layout: '=fbLayout'
+          layout: '=fbLayout',
+          model: '='
         },
-        template: "<div class=\"row\" ng-repeat=\"row in layout.rows\">\n    <div class=\"col-md-{{column.width}}\" ng-repeat=\"column in row.columns\">\n        <div ng-model=\"column.formData.inputs\" fb-form=\"{{$parent.$index + '' + $index}}\" fb-default=\"defaultValue[$parent.$index + '' + $index]\"></div>\n    </div>\n</div>",
+        template: "<div class=\"row\" ng-repeat=\"row in layout.rows\">\n    <div class=\"col-md-{{column.width}}\" ng-repeat=\"column in row.columns\">\n        <div ng-model=\"column.formData.inputs\" model=\"model\" fb-form=\"{{$parent.$index + '' + $index}}\" fb-default=\"defaultValue[$parent.$index + '' + $index]\"></div>\n    </div>\n</div>",
         link: function(scope) {
           var column, i, input, j, row, _i, _len, _ref, _results;
           scope.defaultValue = {};
+          if (scope.model == null) {
+            scope.model = {};
+          }
           _ref = scope.layout.rows;
           _results = [];
           for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
@@ -591,6 +600,7 @@
         scope: {
           formName: '@fbForm',
           input: '=ngModel',
+          model: '=',
           "default": '=fbDefault'
         },
         template: "<div class='fb-form-object' ng-repeat=\"object in form\" fb-form-object=\"object\"></div>",

@@ -415,17 +415,19 @@ angular.module 'builder.directive', [
     restrict: 'A'
     scope:
         layout: '=fbLayout'
+        model: '='
     template:
         """
         <div class="row" ng-repeat="row in layout.rows">
             <div class="col-md-{{column.width}}" ng-repeat="column in row.columns">
-                <div ng-model="column.formData.inputs" fb-form="{{$parent.$index + '' + $index}}" fb-default="defaultValue[$parent.$index + '' + $index]"></div>
+                <div ng-model="column.formData.inputs" model="model" fb-form="{{$parent.$index + '' + $index}}" fb-default="defaultValue[$parent.$index + '' + $index]"></div>
             </div>
         </div>
         """
     link: (scope) ->
 
         scope.defaultValue = {}
+        scope.model ?= {}
 
         for row, i in scope.layout.rows
             for column, j in row.columns
@@ -446,6 +448,7 @@ angular.module 'builder.directive', [
         # input model for scops in ng-repeat
         formName: '@fbForm'
         input: '=ngModel'
+        model: '='
         default: '=fbDefault'
     template:
         """
