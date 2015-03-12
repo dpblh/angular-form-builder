@@ -166,7 +166,7 @@
         @param value: The input value.
          */
         var input;
-        $scope.$parent.model[$scope.formObject.id] = value;
+        $scope.$parent.model[$scope.formObject.modelName] = value;
         input = {
           id: $scope.formObject.id,
           label: $scope.formObject.label,
@@ -654,6 +654,11 @@
           }
           scope.$watch('inputText', function() {
             return scope.updateInput(scope.inputText);
+          });
+          scope.$watch('modelName', function(newValue, oldValue) {
+            if (scope.$parent.model[oldValue]) {
+              return delete scope.$parent.model[oldValue];
+            }
           });
           scope.$watch(attrs.fbFormObject, function() {
             return scope.copyObjectToScope(scope.formObject);

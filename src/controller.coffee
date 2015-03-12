@@ -151,7 +151,7 @@ angular.module 'builder.controller', ['builder.provider']
         Set model value
         @param value: The input value.
         ###
-        $scope.$parent.model[$scope.formObject.id] = value
+        $scope.$parent.model[$scope.formObject.modelName] = value
 
         input =
             id: $scope.formObject.id

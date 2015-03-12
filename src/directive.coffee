@@ -499,6 +499,8 @@ angular.module 'builder.directive', [
                 scope.inputText = checked
             , yes
         scope.$watch 'inputText', -> scope.updateInput scope.inputText
+        scope.$watch 'modelName', (newValue, oldValue) ->
+            delete scope.$parent.model[oldValue] if scope.$parent.model[oldValue]
         # watch (management updated form objects
         scope.$watch attrs.fbFormObject, ->
             scope.copyObjectToScope scope.formObject
