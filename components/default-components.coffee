@@ -6,6 +6,7 @@ angular.module 'builder.components', ['builder', 'validator.rules']
     # ----------------------------------------
     $builderProvider.registerComponent 'textInput',
         group: 'Default'
+        modelName: 'model name'
         label: 'Text Input'
         description: 'description'
         placeholder: 'placeholder'
@@ -29,6 +30,10 @@ angular.module 'builder.components', ['builder', 'validator.rules']
         popoverTemplate:
             """
             <form>
+                <div class="form-group">
+                    <label class='control-label'>Model name</label>
+                    <input type='text' ng-model="modelName" validator="[required]" class='form-control'/>
+                </div>
                 <div class="form-group">
                     <label class='control-label'>Label</label>
                     <input type='text' ng-model="label" validator="[required]" class='form-control'/>
@@ -65,6 +70,7 @@ angular.module 'builder.components', ['builder', 'validator.rules']
     # ----------------------------------------
     $builderProvider.registerComponent 'textArea',
         group: 'Default'
+        modelName: 'model name'
         label: 'Text Area'
         description: 'description'
         placeholder: 'placeholder'
@@ -82,6 +88,10 @@ angular.module 'builder.components', ['builder', 'validator.rules']
         popoverTemplate:
             """
             <form>
+                <div class="form-group">
+                    <label class='control-label'>Model name</label>
+                    <input type='text' ng-model="modelName" validator="[required]" class='form-control'/>
+                </div>
                 <div class="form-group">
                     <label class='control-label'>Label</label>
                     <input type='text' ng-model="label" validator="[required]" class='form-control'/>
@@ -176,6 +186,7 @@ angular.module 'builder.components', ['builder', 'validator.rules']
     # ----------------------------------------
     $builderProvider.registerComponent 'radio',
         group: 'Default'
+        modelName: 'model name'
         label: 'Radio'
         description: 'description'
         placeholder: 'placeholder'
@@ -198,6 +209,10 @@ angular.module 'builder.components', ['builder', 'validator.rules']
         popoverTemplate:
             """
             <form>
+                <div class="form-group">
+                    <label class='control-label'>Model name</label>
+                    <input type='text' ng-model="modelName" validator="[required]" class='form-control'/>
+                </div>
                 <div class="form-group">
                     <label class='control-label'>Label</label>
                     <input type='text' ng-model="label" validator="[required]" class='form-control'/>
@@ -225,6 +240,7 @@ angular.module 'builder.components', ['builder', 'validator.rules']
     # ----------------------------------------
     $builderProvider.registerComponent 'select',
         group: 'Default'
+        modelName: 'model name'
         label: 'Select'
         description: 'description'
         placeholder: 'placeholder'
@@ -244,6 +260,10 @@ angular.module 'builder.components', ['builder', 'validator.rules']
         popoverTemplate:
             """
             <form>
+                <div class="form-group">
+                    <label class='control-label'>Model name</label>
+                    <input type='text' ng-model="modelName" validator="[required]" class='form-control'/>
+                </div>
                 <div class="form-group">
                     <label class='control-label'>Label</label>
                     <input type='text' ng-model="label" validator="[required]" class='form-control'/>
