@@ -31,13 +31,14 @@
         var component;
         copyObjectToScope(formObject, $scope);
         $scope.optionsText = formObject.options.join('\n');
-        $scope.$watch('[label, description, placeholder, required, options, validation]', function() {
+        $scope.$watch('[label, description, placeholder, required, options, validation, someOptions]', function() {
           formObject.label = $scope.label;
           formObject.description = $scope.description;
           formObject.placeholder = $scope.placeholder;
           formObject.required = $scope.required;
           formObject.options = $scope.options;
-          return formObject.validation = $scope.validation;
+          formObject.validation = $scope.validation;
+          return formObject.someOptions = $scope.someOptions;
         }, true);
         $scope.$watch('optionsText', function(text) {
           var x;
@@ -71,7 +72,8 @@
             placeholder: $scope.placeholder,
             required: $scope.required,
             optionsText: $scope.optionsText,
-            validation: $scope.validation
+            validation: $scope.validation,
+            someOptions: angular.copy($scope.someOptions)
           };
         },
         rollback: function() {
@@ -87,7 +89,8 @@
           $scope.placeholder = this.model.placeholder;
           $scope.required = this.model.required;
           $scope.optionsText = this.model.optionsText;
-          return $scope.validation = this.model.validation;
+          $scope.validation = this.model.validation;
+          return $scope.someOptions = this.model.someOptions;
         }
       };
     }
