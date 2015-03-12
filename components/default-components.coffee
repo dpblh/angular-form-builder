@@ -114,6 +114,7 @@ angular.module 'builder.components', ['builder', 'validator.rules']
     # ----------------------------------------
     $builderProvider.registerComponent 'checkbox',
         group: 'Default'
+        modelName: 'model name'
         label: 'Checkbox'
         description: 'description'
         placeholder: 'placeholder'
@@ -127,7 +128,7 @@ angular.module 'builder.components', ['builder', 'validator.rules']
                 <div class="col-sm-8">
                     <input type='hidden' ng-model="inputText" validator-required="{{required}}" validator-group="{{formName}}"/>
                     <div class='checkbox' ng-repeat="item in options track by $index">
-                        <label><input type='checkbox' ng-model="$parent.inputArray[$index]" value='item'/>
+                        <label><input type='checkbox' ng-model="$parent.inputArray[$index]" ng-checked='$parent.inputArray[$index]' value='item'/>
                             {{item}}
                         </label>
                     </div>
@@ -138,6 +139,10 @@ angular.module 'builder.components', ['builder', 'validator.rules']
         popoverTemplate:
             """
             <form>
+                <div class="form-group">
+                    <label class='control-label'>Model name</label>
+                    <input type='text' ng-model="modelName" validator="[required]" class='form-control'/>
+                </div>
                 <div class="form-group">
                     <label class='control-label'>Label</label>
                     <input type='text' ng-model="label" validator="[required]" class='form-control'/>

@@ -34,7 +34,8 @@ angular.module 'builder.controller', ['builder.provider']
 
         $scope.optionsText = formObject.options.join '\n'
 
-        $scope.$watch '[label, description, placeholder, required, options, validation, someOptions]', ->
+        $scope.$watch '[modelName, label, description, placeholder, required, options, validation, someOptions]', ->
+            formObject.modelName = $scope.modelName
             formObject.label = $scope.label
             formObject.description = $scope.description
             formObject.placeholder = $scope.placeholder
@@ -58,6 +59,7 @@ angular.module 'builder.controller', ['builder.provider']
             Backup input value.
             ###
             @model =
+                modelName: $scope.modelName
                 label: $scope.label
                 description: $scope.description
                 placeholder: $scope.placeholder
@@ -70,6 +72,7 @@ angular.module 'builder.controller', ['builder.provider']
             Rollback input value.
             ###
             return if not @model
+            $scope.modelName = @model.modelName
             $scope.label = @model.label
             $scope.description = @model.description
             $scope.placeholder = @model.placeholder

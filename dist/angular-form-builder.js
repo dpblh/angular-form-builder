@@ -31,7 +31,8 @@
         var component;
         copyObjectToScope(formObject, $scope);
         $scope.optionsText = formObject.options.join('\n');
-        $scope.$watch('[label, description, placeholder, required, options, validation, someOptions]', function() {
+        $scope.$watch('[modelName, label, description, placeholder, required, options, validation, someOptions]', function() {
+          formObject.modelName = $scope.modelName;
           formObject.label = $scope.label;
           formObject.description = $scope.description;
           formObject.placeholder = $scope.placeholder;
@@ -67,6 +68,7 @@
           Backup input value.
            */
           return this.model = {
+            modelName: $scope.modelName,
             label: $scope.label,
             description: $scope.description,
             placeholder: $scope.placeholder,
@@ -84,6 +86,7 @@
           if (!this.model) {
             return;
           }
+          $scope.modelName = this.model.modelName;
           $scope.label = this.model.label;
           $scope.description = this.model.description;
           $scope.placeholder = this.model.placeholder;
@@ -646,7 +649,7 @@
                   checked.push((_ref = scope.options[index]) != null ? _ref : scope.inputArray[index]);
                 }
               }
-              return scope.inputText = checked.join(', ');
+              return scope.inputText = checked;
             }, true);
           }
           scope.$watch('inputText', function() {
