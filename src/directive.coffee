@@ -420,7 +420,7 @@ angular.module 'builder.directive', [
         """
         <div class="row" ng-repeat="row in layout.rows">
             <div class="col-md-{{column.width}}" ng-repeat="column in row.columns">
-                <div ng-model="column.formData.inputs" model="model" fb-form="{{$parent.$index + '' + $index}}" fb-default="layout.default"></div>
+                <div ng-model="model" fb-form="{{$parent.$index + '' + $index}}" fb-default="layout.default"></div>
             </div>
         </div>
         """
@@ -448,8 +448,7 @@ angular.module 'builder.directive', [
     scope:
         # input model for scops in ng-repeat
         formName: '@fbForm'
-        input: '=ngModel'
-        model: '='
+        model: '=ngModel'
         default: '=fbDefault'
     template:
         """

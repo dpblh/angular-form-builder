@@ -122,12 +122,9 @@ angular.module 'builder.controller', ['builder.provider']
     $timeout = $injector.get '$timeout'
 
     # set default for input
-    $scope.input ?= []
     $scope.model ?= {}
     $scope.$watch 'form', ->
         # remove superfluous input
-        if $scope.input.length > $scope.form.length
-            $scope.input.splice $scope.form.length
         # tell children to update input value.
         # ! use $timeout for waiting $scope updated.
         $timeout ->
@@ -161,9 +158,4 @@ angular.module 'builder.controller', ['builder.provider']
 
         setValue($scope.formObject.modelName.split('.'), value) if $scope.formObject.modelName
 
-        input =
-            id: $scope.formObject.id
-            label: $scope.formObject.label
-            value: value ? ''
-        $scope.$parent.input.splice $scope.$index, 1, input
 ]
