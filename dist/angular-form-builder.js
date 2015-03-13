@@ -136,16 +136,10 @@
       var $builder, $timeout;
       $builder = $injector.get('$builder');
       $timeout = $injector.get('$timeout');
-      if ($scope.input == null) {
-        $scope.input = [];
-      }
       if ($scope.model == null) {
         $scope.model = {};
       }
       return $scope.$watch('form', function() {
-        if ($scope.input.length > $scope.form.length) {
-          $scope.input.splice($scope.form.length);
-        }
         return $timeout(function() {
           return $scope.$broadcast($builder.broadcastChannel.updateInput);
         });
@@ -165,14 +159,25 @@
         Set model value
         @param value: The input value.
          */
-        var input;
-        $scope.$parent.model[$scope.formObject.modelName] = value;
-        input = {
-          id: $scope.formObject.id,
-          label: $scope.formObject.label,
-          value: value != null ? value : ''
+        var setValue;
+        setValue = function(path, value2) {
+          var currentData, index, _i, _len;
+          currentData = $scope.$parent.model;
+          for (index = _i = 0, _len = path.length; _i < _len; index = ++_i) {
+            value = path[index];
+            if (!(path.length > index + 1)) {
+              continue;
+            }
+            if (!currentData[value]) {
+              currentData[value] = {};
+            }
+            currentData = currentData[value];
+          }
+          return currentData[path[path.length - 1]] = value2;
         };
-        return $scope.$parent.input.splice($scope.$index, 1, input);
+        if ($scope.formObject.modelName) {
+          return setValue($scope.formObject.modelName.split('.'), value);
+        }
       };
     }
   ]);
@@ -473,8 +478,8 @@
         scope: {
           layout: '=fbLayoutBuilder'
         },
-        template: "<div class=\"panel panel-default\" style='position: relative;'>\n    <div class=\"panel-heading\">\n        <h3 class=\"panel-title\">Builder</h3>\n    </div>\n\n    <div class=\"row\" ng-repeat=\"row in layout.rows\">\n        <div class=\"col-md-{{column.width}}\" ng-repeat=\"column in row.columns\">\n            <div fb-builder=\"column.formData.views\" form-name=\"{{$parent.$index + '' + $index}}\"></div>\n        </div>\n    </div>\n</div>\n",
-        templatePopover: "<form role=\"form\" class='form-horizontal'>\n\n        <div class=\"form-group\" ng-repeat='row in layout.rows'>\n            <label class='col-lg-1 control-label' ng-click=\"removeRow(row)\">x</label>\n            <div class='col-lg-11'>\n                <div class='col-lg-{{column.width}}' ng-repeat='column in row.columns'>\n                    <input type='text' class='form-control' ng-model='column.width'/>\n                    <label class='col-lg-1 control-label' ng-click='removeColumn(row, column)'>x</label>\n                </div>\n                <label class='btn btn-default' ng-click='addColumn(row)'>+</label>\n            </div>\n        </div>\n\n    <label class='btn btn-default' ng-click='addRow()'>+</label>\n</form>",
+        template: "<div class=\"panel panel-default\" style='position: relative;'>\n    <div class=\"panel-heading\">\n        <h3 class=\"panel-title\">Builder</h3>\n    </div>\n\n    <div class=\"row\" ng-repeat=\"row in layout.rows\">\n        <fieldset>\n            <legend ng-if=\"row.label\" ng-bind=\"row.label\"></legend>\n            <div class=\"col-md-{{column.width}}\" ng-repeat=\"column in row.columns\">\n                <div fb-builder=\"column.formData.views\" form-name=\"{{$parent.$index + '' + $index}}\"></div>\n            </div>\n        </fieldset>\n\n    </div>\n</div>\n",
+        templatePopover: "<form role=\"form\" class='form-horizontal'>\n\n    <div ng-repeat='row in layout.rows'>\n        <div class=\"form-group\">\n            <label class='col-lg-4 control-label' ng-click=\"removeRow(row)\"><span style='color: red'>x</span> удалить строку</label>\n        </div>\n        <div class=\"form-group\">\n            <label class='col-lg-4 control-label'>Наименование строки</label>\n            <div class='col-lg-8'>\n                <input type='text' class='form-control col-lg-8' ng-model='row.label'/>\n            </div>\n\n        </div>\n        <div class=\"form-group\">\n\n                <div class='col-lg-3' ng-repeat='column in row.columns'>\n                    <input type='text' class='form-control' ng-model='column.width'/>\n                    <label class='col-lg-1 control-label' ng-click='removeColumn(row, column)'><span style='color: red'>x</span></label>\n                </div>\n\n                <label class='btn btn-default' ng-click='addColumn(row)'>+</label>\n        </div>\n    </div>\n\n    <label class='btn btn-default' ng-click='addRow()'>+</label>\n</form>",
         link: function(scope, element) {
           var viewPopover;
           viewPopover = $compile(fbLayoutBuilder.templatePopover)(scope);
@@ -561,40 +566,36 @@
           layout: '=fbLayout',
           model: '='
         },
-        template: "<div class=\"row\" ng-repeat=\"row in layout.rows\">\n    <div class=\"col-md-{{column.width}}\" ng-repeat=\"column in row.columns\">\n        <div ng-model=\"column.formData.inputs\" model=\"model\" fb-form=\"{{$parent.$index + '' + $index}}\" fb-default=\"defaultValue[$parent.$index + '' + $index]\"></div>\n    </div>\n</div>",
+        template: "<div class=\"row\" ng-repeat=\"row in layout.rows\">\n    <fieldset>\n        <legend ng-if=\"row.label\" ng-bind=\"row.label\"></legend>\n        <div class=\"col-md-{{column.width}}\" ng-repeat=\"column in row.columns\">\n            <div ng-model=\"model\" fb-form=\"{{$parent.$index + '' + $index}}\" fb-default=\"layout.default\"></div>\n        </div>\n    </fieldset>\n</div>",
         link: function(scope) {
-          var column, i, input, j, row, _i, _len, _ref, _results;
+          var rebuild;
           scope.defaultValue = {};
           if (scope.model == null) {
             scope.model = {};
           }
-          _ref = scope.layout.rows;
-          _results = [];
-          for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
-            row = _ref[i];
-            _results.push((function() {
-              var _j, _len1, _ref1, _results1;
-              _ref1 = row.columns;
-              _results1 = [];
-              for (j = _j = 0, _len1 = _ref1.length; _j < _len1; j = ++_j) {
-                column = _ref1[j];
-                $builder.addAllFormObject("" + i + j, column.formData.views);
-                scope.defaultValue["" + i + j] = {};
-                _results1.push((function() {
-                  var _k, _len2, _ref2, _results2;
-                  _ref2 = column.formData.inputs;
-                  _results2 = [];
-                  for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
-                    input = _ref2[_k];
-                    _results2.push(scope.defaultValue["" + i + j][input.id] = input.value);
-                  }
-                  return _results2;
-                })());
-              }
-              return _results1;
-            })());
-          }
-          return _results;
+          rebuild = function() {
+            var column, i, j, row, _i, _len, _ref, _results;
+            _ref = scope.layout.rows;
+            _results = [];
+            for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
+              row = _ref[i];
+              _results.push((function() {
+                var _j, _len1, _ref1, _results1;
+                _ref1 = row.columns;
+                _results1 = [];
+                for (j = _j = 0, _len1 = _ref1.length; _j < _len1; j = ++_j) {
+                  column = _ref1[j];
+                  _results1.push($builder.addAllFormObject("" + i + j, column.formData.views));
+                }
+                return _results1;
+              })());
+            }
+            return _results;
+          };
+          scope.$watch('layout', function() {
+            return rebuild();
+          });
+          return rebuild();
         }
       };
     }
@@ -605,8 +606,7 @@
         require: 'ngModel',
         scope: {
           formName: '@fbForm',
-          input: '=ngModel',
-          model: '=',
+          model: '=ngModel',
           "default": '=fbDefault'
         },
         template: "<div class='fb-form-object' ng-repeat=\"object in form\" fb-form-object=\"object\"></div>",
@@ -656,9 +656,34 @@
             return scope.updateInput(scope.inputText);
           });
           scope.$watch('modelName', function(newValue, oldValue) {
-            if (scope.$parent.model[oldValue]) {
-              return delete scope.$parent.model[oldValue];
+            var currentObject, firstObject, index, objectsPool, value, _i, _j, _len, _len1, _ref, _results;
+            if (!oldValue) {
+              return;
             }
+            objectsPool = [];
+            currentObject = scope.$parent.model;
+            _ref = oldValue.split('.');
+            for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
+              value = _ref[index];
+              objectsPool.push({
+                parent: currentObject,
+                name: value
+              });
+              currentObject = currentObject[value];
+            }
+            objectsPool = objectsPool.reverse();
+            firstObject = objectsPool.shift();
+            firstObject.parent[firstObject.name] = void 0;
+            _results = [];
+            for (_j = 0, _len1 = objectsPool.length; _j < _len1; _j++) {
+              value = objectsPool[_j];
+              if (angular.equals({}, value.parent[value.name])) {
+                _results.push(delete value.parent[value.name]);
+              } else {
+                _results.push(void 0);
+              }
+            }
+            return _results;
           });
           scope.$watch(attrs.fbFormObject, function() {
             return scope.copyObjectToScope(scope.formObject);
@@ -679,7 +704,7 @@
           if (!scope.$component.arrayToText && scope.formObject.options.length > 0) {
             scope.inputText = scope.formObject.options[0];
           }
-          return scope.$watch("default['" + scope.formObject.id + "']", function(value) {
+          return scope.$watch("default." + scope.formObject.modelName, function(value) {
             if (!value) {
               return;
             }

@@ -35,84 +35,63 @@
       });
     }
   ]).controller('DemoController', [
-    '$scope', '$builder', '$validator', function($scope, $builder, $validator) {
-      $scope["default"] = {};
+    '$scope', '$builder', '$validator', '$timeout', function($scope, $builder, $validator, $timeout) {
+      $scope.model = {
+        id: 1
+      };
       $scope.layout = {
-        rows: [
+        "rows": [
           {
-            columns: [
+            "label": "Персональные данные",
+            "columns": [
               {
-                width: 6,
-                formData: {
-                  inputs: [
+                "width": 6,
+                "formData": {
+                  "name": "example",
+                  "views": [
                     {
-                      "id": "example2",
-                      "label": "Text Input2",
-                      "value": "hello"
-                    }
-                  ],
-                  name: "example",
-                  views: [
-                    {
-                      "id": "example2",
+                      "id": "a1c5624a-a44d-c220-56f3-03d22828323d",
+                      "component": "checkbox",
+                      "editable": true,
+                      "index": 0,
+                      "label": "Checkbox",
+                      "description": "description",
+                      "placeholder": "placeholder",
+                      "options": ["value one", "value two"],
+                      "required": false,
+                      "validation": "/.*/",
+                      "modelName": "personal.data.lastName"
+                    }, {
+                      "id": "ea1f2e51-4d37-4460-b67e-f0f32c9ea22e",
                       "component": "textInput",
                       "editable": true,
-                      "label": "Text Input2",
+                      "index": 1,
+                      "label": "Text Input",
                       "description": "description",
                       "placeholder": "placeholder",
                       "options": [],
                       "required": false,
-                      "validation": "/.*/"
-                    }
-                  ]
-                }
-              }, {
-                width: 6,
-                formData: {
-                  inputs: [],
-                  name: "example",
-                  views: [
-                    {
-                      "id": "example3",
-                      "component": "textInput",
-                      "editable": true,
-                      "label": "Text Input2",
-                      "description": "description",
-                      "placeholder": "placeholder",
-                      "options": [],
-                      "required": false,
-                      "validation": "/.*/"
-                    }
-                  ]
-                }
-              }
-            ]
-          }, {
-            columns: [
-              {
-                width: 12,
-                formData: {
-                  inputs: [],
-                  name: "example",
-                  views: [
-                    {
-                      "id": "example4",
-                      "component": "textInput",
-                      "editable": true,
-                      "label": "Text Input2",
-                      "description": "description",
-                      "placeholder": "placeholder",
-                      "options": [],
-                      "required": false,
-                      "validation": "/.*/"
+                      "validation": "/.*/",
+                      "modelName": "personal.data.middleName"
                     }
                   ]
                 }
               }
             ]
           }
-        ]
+        ],
+        "default": {
+          "personal": {
+            "data": {
+              "lastName": ["value one", "value two"],
+              "middleName": "ser"
+            }
+          }
+        }
       };
+      $timeout(function() {
+        return $scope.layout["default"].personal.data.middleName = "fggggggggggggggggg";
+      }, 1000);
       return $scope.submit = function() {
         return $validator.validate($scope, 'default').success(function() {
           return console.log('success');
