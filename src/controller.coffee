@@ -151,7 +151,15 @@ angular.module 'builder.controller', ['builder.provider']
         Set model value
         @param value: The input value.
         ###
-        $scope.$parent.model[$scope.formObject.modelName] = value
+
+        setValue = (path, value2) ->
+            currentData = $scope.$parent.model
+            for value, index in path when path.length > index+1
+                currentData[value] = {} unless currentData[value]
+                currentData = currentData[value]
+            currentData[path[path.length - 1]] = value2
+
+        setValue($scope.formObject.modelName.split('.'), value) if $scope.formObject.modelName
 
         input =
             id: $scope.formObject.id

@@ -420,7 +420,7 @@ angular.module 'builder.directive', [
         """
         <div class="row" ng-repeat="row in layout.rows">
             <div class="col-md-{{column.width}}" ng-repeat="column in row.columns">
-                <div ng-model="column.formData.inputs" model="model" fb-form="{{$parent.$index + '' + $index}}" fb-default="defaultValue[$parent.$index + '' + $index]"></div>
+                <div ng-model="column.formData.inputs" model="model" fb-form="{{$parent.$index + '' + $index}}" fb-default="layout.default"></div>
             </div>
         </div>
         """
@@ -429,12 +429,13 @@ angular.module 'builder.directive', [
         scope.defaultValue = {}
         scope.model ?= {}
 
-        for row, i in scope.layout.rows
-            for column, j in row.columns
-                $builder.addAllFormObject "#{i}#{j}", column.formData.views
-                scope.defaultValue["#{i}#{j}"] = {}
-                for input in column.formData.inputs
-                    scope.defaultValue["#{i}#{j}"][input.id] = input.value
+        rebuild = ->
+            for row, i in scope.layout.rows
+                for column, j in row.columns
+                    $builder.addAllFormObject "#{i}#{j}", column.formData.views
+
+        scope.$watch 'layout', -> rebuild()
+        rebuild()
 
 ]
 
@@ -500,7 +501,22 @@ angular.module 'builder.directive', [
             , yes
         scope.$watch 'inputText', -> scope.updateInput scope.inputText
         scope.$watch 'modelName', (newValue, oldValue) ->
-            delete scope.$parent.model[oldValue] if scope.$parent.model[oldValue]
+            return unless oldValue
+
+            objectsPool = []
+            currentObject =  scope.$parent.model
+            for value, index in oldValue.split '.'
+                objectsPool.push
+                    parent: currentObject
+                    name: value
+                currentObject = currentObject[value]
+
+            objectsPool = objectsPool.reverse()
+            firstObject = objectsPool.shift()
+            firstObject.parent[firstObject.name] = undefined
+            for value in objectsPool
+                delete value.parent[value.name] if angular.equals {}, value.parent[value.name]
+
         # watch (management updated form objects
         scope.$watch attrs.fbFormObject, ->
             scope.copyObjectToScope scope.formObject
@@ -522,7 +538,7 @@ angular.module 'builder.directive', [
             scope.inputText = scope.formObject.options[0]
 
         # set default value
-        scope.$watch "default['#{scope.formObject.id}']", (value) ->
+        scope.$watch "default.#{scope.formObject.modelName}", (value) ->
             return if not value
             if scope.$component.arrayToText
                 scope.inputArray = value

@@ -70,72 +70,73 @@ angular.module 'app', ['builder', 'builder.components', 'validator.rules']
 ]
 
 
-.controller 'DemoController', ['$scope', '$builder', '$validator', ($scope, $builder, $validator) ->
+.controller 'DemoController', ['$scope', '$builder', '$validator', '$timeout', ($scope, $builder, $validator, $timeout) ->
     # ----------------------------------------
     # builder
     # ----------------------------------------
 
-
-    $scope.default = {};
-
+    $scope.model =
+        id: 1
+#    $timeout( ->
     $scope.layout =
-        rows:
-            [
-                {
-                    columns: [{
-                        width: 6, formData: {
-                            inputs: [{"id": "example2", "label": "Text Input2", "value": "hello"}],
-                            name: "example",
-                            views: [{
-                                "id": "example2",
-                                "component": "textInput",
-                                "editable": true,
-                                "label": "Text Input2",
-                                "description": "description",
-                                "placeholder": "placeholder",
-                                "options": [],
-                                "required": false,
-                                "validation": "/.*/"
-                            }]
-                        }
-                    }, {
-                        width: 6, formData: {
-                            inputs: [],
-                            name: "example",
-                            views: [{
-                                "id": "example3",
-                                "component": "textInput",
-                                "editable": true,
-                                "label": "Text Input2",
-                                "description": "description",
-                                "placeholder": "placeholder",
-                                "options": [],
-                                "required": false,
-                                "validation": "/.*/"
-                            }]
-                        }
-                    }]
-                },
-                {
-                    columns: [{
-                        width: 12, formData: {
-                            inputs: [],
-                            name: "example",
-                            views: [{
-                                "id": "example4",
-                                "component": "textInput",
-                                "editable": true,
-                                "label": "Text Input2",
-                                "description": "description",
-                                "placeholder": "placeholder",
-                                "options": [],
-                                "required": false,
-                                "validation": "/.*/"
-                            }]
-                        }
-                    }]
+    {
+        "rows": [{
+            "columns": [{
+                "width": 6, "formData": {
+                    "inputs": [], "name": "example", "views": [
+                        "id": "a1c5624a-a44d-c220-56f3-03d22828323d"
+                        "component": "checkbox"
+                        "editable": true
+                        "index": 0
+                        "label": "Checkbox"
+                        "description": "description"
+                        "placeholder": "placeholder"
+                        "options": ["value one", "value two"]
+                        "required": false
+                        "validation": "/.*/"
+                        "modelName": "personal.data.lastName"
+                    ,
+                        "id":"ea1f2e51-4d37-4460-b67e-f0f32c9ea22e"
+                        "component":"textInput"
+                        "editable":true,"index":1
+                        "label":"Text Input"
+                        "description":"description"
+                        "placeholder":"placeholder"
+                        "options":[]
+                        "required":false
+                        "validation":"/.*/"
+                        "modelName":"personal.data.middleName"
+                    ]
                 }
-            ]
+            }]
+        }]
+        default:
+            "personal":
+                "data":
+                    "lastName":
+                        ["value one","value two"]
+                    "middleName":
+                        "ser"
+    }
+#    , 5000)
+
+
+    $timeout(
+        -> $scope.layout.default.personal.data.middleName = "fggggggggggggggggg"
+    , 1000)
+
+
+#    $scope.default =
+#        "ert":
+#            ["value one","value two"]
+#        "one":
+#            ["value one","value two"]
+
+#    $scope.layout =
+#        rows: []
+
+
+
 
     $scope.submit = ->
         $validator.validate $scope, 'default'
