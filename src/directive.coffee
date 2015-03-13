@@ -319,9 +319,13 @@ angular.module 'builder.directive', [
                 </div>
 
                 <div class="row" ng-repeat="row in layout.rows">
-                    <div class="col-md-{{column.width}}" ng-repeat="column in row.columns">
-                        <div fb-builder="column.formData.views" form-name="{{$parent.$index + '' + $index}}"></div>
-                    </div>
+                    <fieldset>
+                        <legend ng-if="row.label" ng-bind="row.label"></legend>
+                        <div class="col-md-{{column.width}}" ng-repeat="column in row.columns">
+                            <div fb-builder="column.formData.views" form-name="{{$parent.$index + '' + $index}}"></div>
+                        </div>
+                    </fieldset>
+
                 </div>
             </div>
 
@@ -330,16 +334,27 @@ angular.module 'builder.directive', [
             """
             <form role="form" class='form-horizontal'>
 
-                    <div class="form-group" ng-repeat='row in layout.rows'>
-                        <label class='col-lg-1 control-label' ng-click="removeRow(row)">x</label>
-                        <div class='col-lg-11'>
-                            <div class='col-lg-{{column.width}}' ng-repeat='column in row.columns'>
-                                <input type='text' class='form-control' ng-model='column.width'/>
-                                <label class='col-lg-1 control-label' ng-click='removeColumn(row, column)'>x</label>
-                            </div>
-                            <label class='btn btn-default' ng-click='addColumn(row)'>+</label>
-                        </div>
+                <div ng-repeat='row in layout.rows'>
+                    <div class="form-group">
+                        <label class='col-lg-4 control-label' ng-click="removeRow(row)"><span style='color: red'>x</span> удалить строку</label>
                     </div>
+                    <div class="form-group">
+                        <label class='col-lg-4 control-label'>Наименование строки</label>
+                        <div class='col-lg-8'>
+                            <input type='text' class='form-control col-lg-8' ng-model='row.label'/>
+                        </div>
+
+                    </div>
+                    <div class="form-group">
+
+                            <div class='col-lg-3' ng-repeat='column in row.columns'>
+                                <input type='text' class='form-control' ng-model='column.width'/>
+                                <label class='col-lg-1 control-label' ng-click='removeColumn(row, column)'><span style='color: red'>x</span></label>
+                            </div>
+
+                            <label class='btn btn-default' ng-click='addColumn(row)'>+</label>
+                    </div>
+                </div>
 
                 <label class='btn btn-default' ng-click='addRow()'>+</label>
             </form>
@@ -419,9 +434,12 @@ angular.module 'builder.directive', [
     template:
         """
         <div class="row" ng-repeat="row in layout.rows">
-            <div class="col-md-{{column.width}}" ng-repeat="column in row.columns">
-                <div ng-model="model" fb-form="{{$parent.$index + '' + $index}}" fb-default="layout.default"></div>
-            </div>
+            <fieldset>
+                <legend ng-if="row.label" ng-bind="row.label"></legend>
+                <div class="col-md-{{column.width}}" ng-repeat="column in row.columns">
+                    <div ng-model="model" fb-form="{{$parent.$index + '' + $index}}" fb-default="layout.default"></div>
+                </div>
+            </fieldset>
         </div>
         """
     link: (scope) ->

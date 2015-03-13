@@ -81,9 +81,10 @@ angular.module 'app', ['builder', 'builder.components', 'validator.rules']
     $scope.layout =
     {
         "rows": [{
+            "label": "Персональные данные"
             "columns": [{
                 "width": 6, "formData": {
-                    "inputs": [], "name": "example", "views": [
+                    "name": "example", "views": [
                         "id": "a1c5624a-a44d-c220-56f3-03d22828323d"
                         "component": "checkbox"
                         "editable": true
@@ -125,15 +126,6 @@ angular.module 'app', ['builder', 'builder.components', 'validator.rules']
         -> $scope.layout.default.personal.data.middleName = "fggggggggggggggggg"
     , 1000)
 
-
-#    $scope.default =
-#        "ert":
-#            ["value one","value two"]
-#        "one":
-#            ["value one","value two"]
-
-#    $scope.layout =
-#        rows: []
 
 
 
