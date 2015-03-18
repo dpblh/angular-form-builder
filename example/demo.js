@@ -36,62 +36,59 @@
     }
   ]).controller('DemoController', [
     '$scope', '$builder', '$validator', '$timeout', function($scope, $builder, $validator, $timeout) {
-      $scope.model = {
-        id: 1
-      };
-      $scope.layout = {
-        "rows": [
-          {
-            "label": "Персональные данные",
-            "columns": [
-              {
-                "width": 6,
-                "formData": {
-                  "name": "example",
-                  "views": [
-                    {
-                      "id": "a1c5624a-a44d-c220-56f3-03d22828323d",
-                      "component": "checkbox",
-                      "editable": true,
-                      "index": 0,
-                      "label": "Checkbox",
-                      "description": "description",
-                      "placeholder": "placeholder",
-                      "options": ["value one", "value two"],
-                      "required": false,
-                      "validation": "/.*/",
-                      "modelName": "personal.data.lastName"
-                    }, {
-                      "id": "ea1f2e51-4d37-4460-b67e-f0f32c9ea22e",
-                      "component": "textInput",
-                      "editable": true,
-                      "index": 1,
-                      "label": "Text Input",
-                      "description": "description",
-                      "placeholder": "placeholder",
-                      "options": [],
-                      "required": false,
-                      "validation": "/.*/",
-                      "modelName": "personal.data.middleName"
-                    }
-                  ]
+      $timeout(function() {
+        return $scope.layout = {
+          "rows": [
+            {
+              "label": "Персональные данные",
+              "columns": [
+                {
+                  "width": 6,
+                  "formData": {
+                    "name": "example",
+                    "views": [
+                      {
+                        "id": "a1c5624a-a44d-c220-56f3-03d22828323d",
+                        "component": "checkbox",
+                        "editable": true,
+                        "index": 0,
+                        "label": "Checkbox",
+                        "description": "description",
+                        "placeholder": "placeholder",
+                        "options": ["value one", "value two"],
+                        "required": false,
+                        "validation": "/.*/",
+                        "modelName": "personal.data.lastName"
+                      }, {
+                        "id": "ea1f2e51-4d37-4460-b67e-f0f32c9ea22e",
+                        "component": "textInput",
+                        "editable": true,
+                        "index": 1,
+                        "label": "Text Input",
+                        "description": "description",
+                        "placeholder": "placeholder",
+                        "options": [],
+                        "required": false,
+                        "validation": "/.*/",
+                        "modelName": "personal.data.middleName"
+                      }
+                    ]
+                  }
                 }
-              }
-            ]
-          }
-        ],
-        "default": {
-          "personal": {
-            "data": {
-              "lastName": ["value one", "value two"],
-              "middleName": "ser"
+              ]
             }
+          ]
+        };
+      }, 1000);
+      $scope.output = {};
+      $scope.input = {
+        "personal": {
+          "data": {
+            "lastName": ["value one", "value two"],
+            "middleName": "ser"
           }
         }
       };
-      $timeout(function() {
-        return $scope.layout["default"].personal.data.middleName = "fggggggggggggggggg";
-      }, 1000);
       return $scope.submit = function() {
         return $validator.validate($scope, 'default').success(function() {
           return console.log('success');

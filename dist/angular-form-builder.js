@@ -136,8 +136,8 @@
       var $builder, $timeout;
       $builder = $injector.get('$builder');
       $timeout = $injector.get('$timeout');
-      if ($scope.model == null) {
-        $scope.model = {};
+      if ($scope.output == null) {
+        $scope.output = {};
       }
       return $scope.$watch('form', function() {
         return $timeout(function() {
@@ -162,7 +162,7 @@
         var setValue;
         setValue = function(path, value2) {
           var currentData, index, _i, _len;
-          currentData = $scope.$parent.model;
+          currentData = $scope.$parent.output;
           for (index = _i = 0, _len = path.length; _i < _len; index = ++_i) {
             value = path[index];
             if (!(path.length > index + 1)) {
@@ -471,17 +471,43 @@
       };
     }
   ]).directive('fbLayoutBuilder', [
-    '$builder', '$compile', 'utils', function($builder, $compile, utils) {
+    '$builder', '$compile', 'utilsBuilder', function($builder, $compile, utilsBuilder) {
       var fbLayoutBuilder;
       fbLayoutBuilder = {
         restrict: 'A',
         scope: {
           layout: '=fbLayoutBuilder'
         },
-        template: "<div class=\"panel panel-default\" style='position: relative;'>\n    <div class=\"panel-heading\">\n        <h3 class=\"panel-title\">Builder</h3>\n    </div>\n\n    <div class=\"row\" ng-repeat=\"row in layout.rows\">\n        <fieldset>\n            <legend ng-if=\"row.label\" ng-bind=\"row.label\"></legend>\n            <div class=\"col-md-{{column.width}}\" ng-repeat=\"column in row.columns\">\n                <div fb-builder=\"column.formData.views\" form-name=\"{{$parent.$index + '' + $index}}\"></div>\n            </div>\n        </fieldset>\n\n    </div>\n</div>\n",
+        template: "<div class=\"panel panel-default\" style='position: relative;'>\n    <div class=\"panel-heading\">\n        <h3 class=\"panel-title\">Builder</h3>\n    </div>\n    <div class=\"container-fluid\">\n        <div class=\"row\" ng-repeat=\"row in layout.rows\">\n            <legend ng-if=\"row.label\" ng-bind=\"row.label\"></legend>\n            <div class=\"col-md-{{column.width}}\" ng-repeat=\"column in row.columns\">\n                <div fb-builder=\"column.formData.views\" form-name=\"{{$parent.$index + '' + $index}}\"></div>\n            </div>\n        </div>\n    </div>\n\n</div>\n",
         templatePopover: "<form role=\"form\" class='form-horizontal'>\n\n    <div ng-repeat='row in layout.rows'>\n        <div class=\"form-group\">\n            <label class='col-lg-4 control-label' ng-click=\"removeRow(row)\"><span style='color: red'>x</span> удалить строку</label>\n        </div>\n        <div class=\"form-group\">\n            <label class='col-lg-4 control-label'>Наименование строки</label>\n            <div class='col-lg-8'>\n                <input type='text' class='form-control col-lg-8' ng-model='row.label'/>\n            </div>\n\n        </div>\n        <div class=\"form-group\">\n\n                <div class='col-lg-3' ng-repeat='column in row.columns'>\n                    <input type='text' class='form-control' ng-model='column.width'/>\n                    <label class='col-lg-1 control-label' ng-click='removeColumn(row, column)'><span style='color: red'>x</span></label>\n                </div>\n\n                <label class='btn btn-default' ng-click='addColumn(row)'>+</label>\n        </div>\n    </div>\n\n    <label class='btn btn-default' ng-click='addRow()'>+</label>\n</form>",
         link: function(scope, element) {
-          var viewPopover;
+          var rebuild, viewPopover;
+          rebuild = function() {
+            var column, i, j, row, _i, _len, _ref, _results;
+            if (!scope.layout || !scope.layout.rows) {
+              return;
+            }
+            _ref = scope.layout.rows;
+            _results = [];
+            for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
+              row = _ref[i];
+              _results.push((function() {
+                var _j, _len1, _ref1, _results1;
+                _ref1 = row.columns;
+                _results1 = [];
+                for (j = _j = 0, _len1 = _ref1.length; _j < _len1; j = ++_j) {
+                  column = _ref1[j];
+                  _results1.push($builder.addAllFormObject("" + i + j, column.formData.views));
+                }
+                return _results1;
+              })());
+            }
+            return _results;
+          };
+          scope.$watch('layout', function() {
+            return rebuild();
+          });
+          rebuild();
           viewPopover = $compile(fbLayoutBuilder.templatePopover)(scope);
           $(element).popover({
             html: true,
@@ -508,7 +534,7 @@
                 name: "example",
                 views: [
                   {
-                    "id": utils.guid(),
+                    "id": utilsBuilder.guid(),
                     "component": "textInput",
                     "editable": true,
                     "index": 2,
@@ -536,7 +562,7 @@
                     name: "example",
                     views: [
                       {
-                        "id": utils.guid(),
+                        "id": utilsBuilder.guid(),
                         "component": "textInput",
                         "editable": true,
                         "index": 2,
@@ -564,17 +590,21 @@
         restrict: 'A',
         scope: {
           layout: '=fbLayout',
-          model: '='
+          output: '=fbOutput',
+          input: '=fbInput'
         },
-        template: "<div class=\"row\" ng-repeat=\"row in layout.rows\">\n    <fieldset>\n        <legend ng-if=\"row.label\" ng-bind=\"row.label\"></legend>\n        <div class=\"col-md-{{column.width}}\" ng-repeat=\"column in row.columns\">\n            <div ng-model=\"model\" fb-form=\"{{$parent.$index + '' + $index}}\" fb-default=\"layout.default\"></div>\n        </div>\n    </fieldset>\n</div>",
+        template: "<div class=\"container-fluid\">\n    <div class='row' ng-repeat=\"row in layout.rows\">\n        <legend ng-if=\"row.label\" ng-bind=\"row.label\"></legend>\n        <div class=\"col-md-{{column.width}}\" ng-repeat=\"column in row.columns\">\n            <div ng-model=\"output\" fb-form=\"{{$parent.$index + '' + $index}}\" fb-default=\"input\"></div>\n        </div>\n    </div>\n</div>\n",
         link: function(scope) {
           var rebuild;
           scope.defaultValue = {};
-          if (scope.model == null) {
-            scope.model = {};
+          if (scope.output == null) {
+            scope.output = {};
           }
           rebuild = function() {
             var column, i, j, row, _i, _len, _ref, _results;
+            if (!scope.layout || !scope.layout.rows) {
+              return;
+            }
             _ref = scope.layout.rows;
             _results = [];
             for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
@@ -606,8 +636,8 @@
         require: 'ngModel',
         scope: {
           formName: '@fbForm',
-          model: '=ngModel',
-          "default": '=fbDefault'
+          output: '=ngModel',
+          input: '=fbDefault'
         },
         template: "<div class='fb-form-object' ng-repeat=\"object in form\" fb-form-object=\"object\"></div>",
         controller: 'fbFormController',
@@ -704,7 +734,7 @@
           if (!scope.$component.arrayToText && scope.formObject.options.length > 0) {
             scope.inputText = scope.formObject.options[0];
           }
-          return scope.$watch("default." + scope.formObject.modelName, function(value) {
+          return scope.$watch("input." + scope.formObject.modelName, function(value) {
             if (!value) {
               return;
             }
@@ -1156,11 +1186,11 @@
   var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   angular.module('builder.provider', ['builder.services']).provider('$builder', function() {
-    var $http, $injector, $templateCache, utils;
+    var $http, $injector, $templateCache, utilsBuilder;
     $injector = null;
     $http = null;
     $templateCache = null;
-    utils = null;
+    utilsBuilder = null;
     this.config = {
       popoverPlacement: 'right'
     };
@@ -1209,7 +1239,7 @@
         throw "The component " + formObject.component + " was not registered.";
       }
       result = {
-        id: formObject.id || utils.guid(),
+        id: formObject.id || utilsBuilder.guid(),
         component: formObject.component,
         editable: (_ref = formObject.editable) != null ? _ref : component.editable,
         index: (_ref1 = formObject.index) != null ? _ref1 : 0,
@@ -1236,7 +1266,7 @@
         $injector = injector;
         $http = $injector.get('$http');
         $templateCache = $injector.get('$templateCache');
-        return utils = $injector.get('utils');
+        return utilsBuilder = $injector.get('utilsBuilder');
       };
     })(this);
     this.loadTemplate = function(component) {
@@ -1434,7 +1464,7 @@
  */
 
 (function() {
-  angular.module('builder.services', []).factory('utils', [
+  angular.module('builder.services', []).factory('utilsBuilder', [
     function() {
       return {
         guid: function() {
