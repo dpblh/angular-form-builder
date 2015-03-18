@@ -532,7 +532,7 @@ angular.module 'builder.directive', [
             return unless oldValue
 
             objectsPool = []
-            currentObject =  scope.$parent.model
+            currentObject =  scope.$parent.output
             for value, index in oldValue.split '.'
                 objectsPool.push
                     parent: currentObject
