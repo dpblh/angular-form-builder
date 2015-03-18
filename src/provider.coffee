@@ -17,7 +17,7 @@ angular.module 'builder.provider', ['builder.services']
     $injector = null
     $http = null
     $templateCache = null
-    utils = null
+    utilsBuilder = null
 
     @config =
         popoverPlacement: 'right'
@@ -65,7 +65,7 @@ angular.module 'builder.provider', ['builder.services']
         component = @components[formObject.component]
         throw "The component #{formObject.component} was not registered." if not component?
         result =
-            id: formObject.id || utils.guid()
+            id: formObject.id || utilsBuilder.guid()
             component: formObject.component
             editable: formObject.editable ? component.editable
             index: formObject.index ? 0
@@ -87,7 +87,7 @@ angular.module 'builder.provider', ['builder.services']
         $injector = injector
         $http = $injector.get '$http'
         $templateCache = $injector.get '$templateCache'
-        utils = $injector.get 'utils'
+        utilsBuilder = $injector.get 'utilsBuilder'
 
     @loadTemplate = (component) ->
         ###

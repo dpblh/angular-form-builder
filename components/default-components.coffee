@@ -23,7 +23,7 @@ angular.module 'builder.components', ['builder', 'validator.rules']
                 <label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}">{{label}}</label>
                 <div class="col-sm-8">
                     <input type="text" ng-model="inputText" validator-required="{{required}}" validator-group="{{formName}}" id="{{formName+index}}" class="form-control" placeholder="{{placeholder}}"/>
-                    <p class='help-block'>{{description}}</p>
+                    <p class='help-block' ng-if='description'>{{description}}</p>
                 </div>
             </div>
             """
@@ -81,7 +81,7 @@ angular.module 'builder.components', ['builder', 'validator.rules']
                 <label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}">{{label}}</label>
                 <div class="col-sm-8">
                     <textarea type="text" ng-model="inputText" validator-required="{{required}}" validator-group="{{formName}}" id="{{formName+index}}" class="form-control" rows='6' placeholder="{{placeholder}}"/>
-                    <p class='help-block'>{{description}}</p>
+                    <p class='help-block' ng-if='description'>{{description}}</p>
                 </div>
             </div>
             """
@@ -142,7 +142,7 @@ angular.module 'builder.components', ['builder', 'validator.rules']
                             {{item}}
                         </label>
                     </div>
-                    <p class='help-block'>{{description}}</p>
+                    <p class='help-block' ng-if='description'>{{description}}</p>
                 </div>
             </div>
             """
@@ -181,6 +181,56 @@ angular.module 'builder.components', ['builder', 'validator.rules']
             </form>
             """
 
+    $builderProvider.registerComponent 'check',
+        group: 'Default'
+        modelName: 'model name'
+        label: 'Check'
+        description: 'description'
+        placeholder: 'placeholder'
+        required: no
+        template:
+            """
+            <div class="form-group" ng-init='inputText = false'>
+                <label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}">{{label}}</label>
+                <div class="col-sm-8">
+                    <label><input type='checkbox' ng-model="inputText" ng-checked='inputText'/>
+                        {{item}}
+                    </label>
+                    <p class='help-block' ng-if='description'>{{description}}</p>
+                </div>
+            </div>
+            """
+        popoverTemplate:
+            """
+            <form>
+                <div class="form-group">
+                    <label class='control-label'>Model name</label>
+                    <input type='text' ng-model="modelName" validator="[required]" class='form-control'/>
+                </div>
+                <div class="form-group">
+                    <label class='control-label'>Label</label>
+                    <input type='text' ng-model="label" validator="[required]" class='form-control'/>
+                </div>
+                <div class="form-group">
+                    <label class='control-label'>Description</label>
+                    <input type='text' ng-model="description" class='form-control'/>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type='checkbox' ng-model="required" />
+                        Required
+                    </label>
+                </div>
+
+                <hr/>
+                <div class='form-group'>
+                    <input type='submit' ng-click="popover.save($event)" class='btn btn-primary' value='Save'/>
+                    <input type='button' ng-click="popover.cancel($event)" class='btn btn-default' value='Cancel'/>
+                    <input type='button' ng-click="popover.remove($event)" class='btn btn-danger' value='Delete'/>
+                </div>
+            </form>
+            """
+
     # ----------------------------------------
     # radio
     # ----------------------------------------
@@ -202,7 +252,7 @@ angular.module 'builder.components', ['builder', 'validator.rules']
                             {{item}}
                         </label>
                     </div>
-                    <p class='help-block'>{{description}}</p>
+                    <p class='help-block' ng-if='description'>{{description}}</p>
                 </div>
             </div>
             """
@@ -253,7 +303,7 @@ angular.module 'builder.components', ['builder', 'validator.rules']
                 <div class="col-sm-8">
                     <select ng-options="value for value in options" id="{{formName+index}}" class="form-control"
                         ng-model="inputText" ng-init="inputText = options[0]"/>
-                    <p class='help-block'>{{description}}</p>
+                    <p class='help-block' ng-if='description'>{{description}}</p>
                 </div>
             </div>
             """

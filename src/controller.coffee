@@ -122,7 +122,7 @@ angular.module 'builder.controller', ['builder.provider']
     $timeout = $injector.get '$timeout'
 
     # set default for input
-    $scope.model ?= {}
+    $scope.output ?= {}
     $scope.$watch 'form', ->
         # remove superfluous input
         # tell children to update input value.
@@ -150,7 +150,7 @@ angular.module 'builder.controller', ['builder.provider']
         ###
 
         setValue = (path, value2) ->
-            currentData = $scope.$parent.model
+            currentData = $scope.$parent.output
             for value, index in path when path.length > index+1
                 currentData[value] = {} unless currentData[value]
                 currentData = currentData[value]

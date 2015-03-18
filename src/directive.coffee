@@ -306,7 +306,7 @@ angular.module 'builder.directive', [
 # ----------------------------------------
 # fb-layout-builder
 # ----------------------------------------
-.directive 'fbLayoutBuilder', ['$builder', '$compile', 'utils', ($builder, $compile, utils) ->
+.directive 'fbLayoutBuilder', ['$builder', '$compile', 'utilsBuilder', ($builder, $compile, utilsBuilder) ->
     fbLayoutBuilder =
         restrict: 'A',
         scope:
@@ -317,16 +317,15 @@ angular.module 'builder.directive', [
                 <div class="panel-heading">
                     <h3 class="panel-title">Builder</h3>
                 </div>
-
-                <div class="row" ng-repeat="row in layout.rows">
-                    <fieldset>
+                <div class="container-fluid">
+                    <div class="row" ng-repeat="row in layout.rows">
                         <legend ng-if="row.label" ng-bind="row.label"></legend>
                         <div class="col-md-{{column.width}}" ng-repeat="column in row.columns">
                             <div fb-builder="column.formData.views" form-name="{{$parent.$index + '' + $index}}"></div>
                         </div>
-                    </fieldset>
-
+                    </div>
                 </div>
+
             </div>
 
             """
@@ -361,6 +360,15 @@ angular.module 'builder.directive', [
             """
         link: (scope, element) ->
 
+            rebuild = ->
+                return if !scope.layout or !scope.layout.rows
+                for row, i in scope.layout.rows
+                    for column, j in row.columns
+                        $builder.addAllFormObject "#{i}#{j}", column.formData.views
+
+            scope.$watch 'layout', -> rebuild()
+            rebuild()
+
             viewPopover = $compile(fbLayoutBuilder.templatePopover) scope
 
             $(element).popover
@@ -386,7 +394,7 @@ angular.module 'builder.directive', [
                       inputs: [],
                       name: "example",
                       views: [{
-                          "id": utils.guid(),
+                          "id": utilsBuilder.guid(),
                           "component": "textInput",
                           "editable": true,
                           "index": 2,
@@ -407,7 +415,7 @@ angular.module 'builder.directive', [
                             inputs: [],
                             name: "example",
                             views: [{
-                                "id": utils.guid(),
+                                "id": utilsBuilder.guid(),
                                 "component": "textInput",
                                 "editable": true,
                                 "index": 2,
@@ -430,24 +438,27 @@ angular.module 'builder.directive', [
     restrict: 'A'
     scope:
         layout: '=fbLayout'
-        model: '='
+        output: '=fbOutput'
+        input: '=fbInput'
     template:
         """
-        <div class="row" ng-repeat="row in layout.rows">
-            <fieldset>
+        <div class="container-fluid">
+            <div class='row' ng-repeat="row in layout.rows">
                 <legend ng-if="row.label" ng-bind="row.label"></legend>
                 <div class="col-md-{{column.width}}" ng-repeat="column in row.columns">
-                    <div ng-model="model" fb-form="{{$parent.$index + '' + $index}}" fb-default="layout.default"></div>
+                    <div ng-model="output" fb-form="{{$parent.$index + '' + $index}}" fb-default="input"></div>
                 </div>
-            </fieldset>
+            </div>
         </div>
+
         """
     link: (scope) ->
 
         scope.defaultValue = {}
-        scope.model ?= {}
+        scope.output ?= {}
 
         rebuild = ->
+            return if !scope.layout or !scope.layout.rows
             for row, i in scope.layout.rows
                 for column, j in row.columns
                     $builder.addAllFormObject "#{i}#{j}", column.formData.views
@@ -466,8 +477,8 @@ angular.module 'builder.directive', [
     scope:
         # input model for scops in ng-repeat
         formName: '@fbForm'
-        model: '=ngModel'
-        default: '=fbDefault'
+        output: '=ngModel'
+        input: '=fbDefault'
     template:
         """
         <div class='fb-form-object' ng-repeat="object in form" fb-form-object="object"></div>
@@ -555,7 +566,7 @@ angular.module 'builder.directive', [
             scope.inputText = scope.formObject.options[0]
 
         # set default value
-        scope.$watch "default.#{scope.formObject.modelName}", (value) ->
+        scope.$watch "input.#{scope.formObject.modelName}", (value) ->
             return if not value
             if scope.$component.arrayToText
                 scope.inputArray = value

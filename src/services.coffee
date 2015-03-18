@@ -3,7 +3,7 @@
 ###
 angular.module 'builder.services', []
 
-.factory 'utils', [ ->
+.factory 'utilsBuilder', [ ->
 
   guid:  ->
     s4 = ->
