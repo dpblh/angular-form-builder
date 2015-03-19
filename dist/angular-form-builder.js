@@ -691,7 +691,7 @@
               return;
             }
             objectsPool = [];
-            currentObject = scope.$parent.model;
+            currentObject = scope.$parent.output;
             _ref = oldValue.split('.');
             for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
               value = _ref[index];
