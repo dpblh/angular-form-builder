@@ -653,10 +653,11 @@
     }
   ]).directive('fbFormObject', [
     '$injector', function($injector) {
-      var $builder, $compile, $parse;
+      var $builder, $compile, $parse, $timeout;
       $builder = $injector.get('$builder');
       $compile = $injector.get('$compile');
       $parse = $injector.get('$parse');
+      $timeout = $injector.get('$timeout');
       return {
         restrict: 'A',
         controller: 'fbFormObjectController',
@@ -686,34 +687,38 @@
             return scope.updateInput(scope.inputText);
           });
           scope.$watch('modelName', function(newValue, oldValue) {
-            var currentObject, firstObject, index, objectsPool, value, _i, _j, _len, _len1, _ref, _results;
+            var modelTime;
             if (!oldValue) {
               return;
             }
-            objectsPool = [];
-            currentObject = scope.$parent.output;
-            _ref = oldValue.split('.');
-            for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
-              value = _ref[index];
-              objectsPool.push({
-                parent: currentObject,
-                name: value
-              });
-              currentObject = currentObject[value];
-            }
-            objectsPool = objectsPool.reverse();
-            firstObject = objectsPool.shift();
-            firstObject.parent[firstObject.name] = void 0;
-            _results = [];
-            for (_j = 0, _len1 = objectsPool.length; _j < _len1; _j++) {
-              value = objectsPool[_j];
-              if (angular.equals({}, value.parent[value.name])) {
-                _results.push(delete value.parent[value.name]);
-              } else {
-                _results.push(void 0);
+            $timeout.cancel(modelTime);
+            return modelTime = $timeout(function() {
+              var currentObject, firstObject, index, objectsPool, value, _i, _j, _len, _len1, _ref, _results;
+              objectsPool = [];
+              currentObject = scope.$parent.output;
+              _ref = oldValue.split('.');
+              for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
+                value = _ref[index];
+                objectsPool.push({
+                  parent: currentObject,
+                  name: value
+                });
+                currentObject = currentObject[value];
               }
-            }
-            return _results;
+              objectsPool = objectsPool.reverse();
+              firstObject = objectsPool.shift();
+              firstObject.parent[firstObject.name] = void 0;
+              _results = [];
+              for (_j = 0, _len1 = objectsPool.length; _j < _len1; _j++) {
+                value = objectsPool[_j];
+                if (angular.equals({}, value.parent[value.name])) {
+                  _results.push(delete value.parent[value.name]);
+                } else {
+                  _results.push(void 0);
+                }
+              }
+              return _results;
+            }, 1000);
           });
           scope.$watch(attrs.fbFormObject, function() {
             return scope.copyObjectToScope(scope.formObject);
@@ -734,10 +739,7 @@
           if (!scope.$component.arrayToText && scope.formObject.options.length > 0) {
             scope.inputText = scope.formObject.options[0];
           }
-          return scope.$watch("input." + scope.formObject.modelName, function(value) {
-            if (!value) {
-              return;
-            }
+          return scope.$watch("output." + scope.formObject.modelName, function(value) {
             if (scope.$component.arrayToText) {
               return scope.inputArray = value;
             } else {
