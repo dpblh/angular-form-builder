@@ -501,6 +501,7 @@ angular.module 'builder.directive', [
     $builder = $injector.get '$builder'
     $compile = $injector.get '$compile'
     $parse = $injector.get '$parse'
+    $timeout = $injector.get '$timeout'
 
     restrict: 'A'
     controller: 'fbFormObjectController'
@@ -530,20 +531,22 @@ angular.module 'builder.directive', [
         scope.$watch 'inputText', -> scope.updateInput scope.inputText
         scope.$watch 'modelName', (newValue, oldValue) ->
             return unless oldValue
+            $timeout.cancel modelTime
+            modelTime = $timeout ->
+                objectsPool = []
+                currentObject =  scope.$parent.output
+                for value, index in oldValue.split '.'
+                    objectsPool.push
+                        parent: currentObject
+                        name: value
+                    currentObject = currentObject[value]
 
-            objectsPool = []
-            currentObject =  scope.$parent.output
-            for value, index in oldValue.split '.'
-                objectsPool.push
-                    parent: currentObject
-                    name: value
-                currentObject = currentObject[value]
-
-            objectsPool = objectsPool.reverse()
-            firstObject = objectsPool.shift()
-            firstObject.parent[firstObject.name] = undefined
-            for value in objectsPool
-                delete value.parent[value.name] if angular.equals {}, value.parent[value.name]
+                objectsPool = objectsPool.reverse()
+                firstObject = objectsPool.shift()
+                firstObject.parent[firstObject.name] = undefined
+                for value in objectsPool
+                    delete value.parent[value.name] if angular.equals {}, value.parent[value.name]
+            ,1000
 
         # watch (management updated form objects
         scope.$watch attrs.fbFormObject, ->
@@ -566,8 +569,7 @@ angular.module 'builder.directive', [
             scope.inputText = scope.formObject.options[0]
 
         # set default value
-        scope.$watch "input.#{scope.formObject.modelName}", (value) ->
-            return if not value
+        scope.$watch "output.#{scope.formObject.modelName}", (value) ->
             if scope.$component.arrayToText
                 scope.inputArray = value
             else
