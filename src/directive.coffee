@@ -528,7 +528,10 @@ angular.module 'builder.directive', [
                     checked.push scope.options[index] ? scope.inputArray[index]
                 scope.inputText = checked
             , yes
-        scope.$watch 'inputText', -> scope.updateInput scope.inputText
+        initValue = yes
+        scope.$watch 'inputText', ->
+            return initValue = no if initValue == yes
+            scope.updateInput scope.inputText
         scope.$watch 'modelName', (newValue, oldValue) ->
             return unless oldValue
             $timeout.cancel modelTime

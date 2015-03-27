@@ -190,10 +190,10 @@ angular.module 'builder.components', ['builder', 'validator.rules']
         required: no
         template:
             """
-            <div class="form-group" ng-init='inputText = false'>
+            <div class="form-group">
                 <label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}">{{label}}</label>
                 <div class="col-sm-8">
-                    <label><input type='checkbox' ng-model="inputText" ng-checked='inputText'/>
+                    <label><input type='checkbox' ng-model="inputText"/>
                         {{item}}
                     </label>
                     <p class='help-block' ng-if='description'>{{description}}</p>
