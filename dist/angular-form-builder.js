@@ -662,6 +662,7 @@
         restrict: 'A',
         controller: 'fbFormObjectController',
         link: function(scope, element, attrs) {
+          var initValue;
           scope.formObject = $parse(attrs.fbFormObject)(scope);
           scope.$component = $builder.components[scope.formObject.component];
           scope.$on($builder.broadcastChannel.updateInput, function() {
@@ -683,7 +684,11 @@
               return scope.inputText = checked;
             }, true);
           }
+          initValue = true;
           scope.$watch('inputText', function() {
+            if (initValue === true) {
+              return initValue = false;
+            }
             return scope.updateInput(scope.inputText);
           });
           scope.$watch('modelName', function(newValue, oldValue) {
