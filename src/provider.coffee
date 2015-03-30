@@ -47,8 +47,10 @@ angular.module 'builder.provider', ['builder.services']
             placeholder: component.placeholder ? ''
             editable: component.editable ? yes
             required: component.required ? no
+            show: component.show ? 'true'
             validation: component.validation ? '/.*/'
             validationOptions: component.validationOptions ? []
+            someOptions: component.someOptions ? {}
             options: component.options ? []
             arrayToText: component.arrayToText ? no
             template: component.template
@@ -73,7 +75,9 @@ angular.module 'builder.provider', ['builder.services']
             description: formObject.description ? component.description
             placeholder: formObject.placeholder ? component.placeholder
             options: formObject.options ? component.options
+            someOptions: formObject.someOptions ? {}
             required: formObject.required ? component.required
+            show: formObject.show ? component.show
             validation: formObject.validation ? component.validation
         result
 

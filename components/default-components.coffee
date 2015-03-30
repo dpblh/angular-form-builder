@@ -11,6 +11,7 @@ angular.module 'builder.components', ['form', 'validator.rules']
         description: 'description'
         placeholder: 'placeholder'
         required: no
+        show: 'true'
         validationOptions: [
             {label: 'none', rule: '/.*/'}
             {label: 'number', rule: '[number]'}
@@ -19,7 +20,7 @@ angular.module 'builder.components', ['form', 'validator.rules']
         ]
         template:
             """
-            <div class="form-group">
+            <div class="form-group" builder-show="show">
                 <label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}">{{label}}</label>
                 <div class="col-sm-8">
                     <input type="text" ng-model="inputText" validator-required="{{required}}" validator-group="{{formName}}" id="{{formName+index}}" class="form-control" placeholder="{{placeholder}}"/>
@@ -45,6 +46,10 @@ angular.module 'builder.components', ['form', 'validator.rules']
                 <div class="form-group">
                     <label class='control-label'>Placeholder</label>
                     <input type='text' ng-model="placeholder" class='form-control'/>
+                </div>
+                <div class="form-group">
+                    <label class='control-label'>ngShow</label>
+                    <input type='text' ng-model="show" class='form-control'/>
                 </div>
                 <div class="checkbox">
                     <label>
@@ -75,9 +80,10 @@ angular.module 'builder.components', ['form', 'validator.rules']
         description: 'description'
         placeholder: 'placeholder'
         required: no
+        show: 'true'
         template:
             """
-            <div class="form-group">
+            <div class="form-group" builder-show="show">
                 <label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}">{{label}}</label>
                 <div class="col-sm-8">
                     <textarea type="text" ng-model="inputText" validator-required="{{required}}" validator-group="{{formName}}" id="{{formName+index}}" class="form-control" rows='6' placeholder="{{placeholder}}"/>
@@ -104,6 +110,10 @@ angular.module 'builder.components', ['form', 'validator.rules']
                     <label class='control-label'>Placeholder</label>
                     <input type='text' ng-model="placeholder" class='form-control'/>
                 </div>
+                <div class="form-group">
+                    <label class='control-label'>ngShow</label>
+                    <input type='text' ng-model="show" class='form-control'/>
+                </div>
                 <div class="checkbox">
                     <label>
                         <input type='checkbox' ng-model="required" />
@@ -129,11 +139,12 @@ angular.module 'builder.components', ['form', 'validator.rules']
         description: 'description'
         placeholder: 'placeholder'
         required: no
+        show: 'true'
         options: ['value one', 'value two']
         arrayToText: yes
         template:
             """
-            <div class="form-group">
+            <div class="form-group" builder-show="show">
                 <label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}">{{label}}</label>
                 <div class="col-sm-8">
                     <input type='hidden' ng-model="inputText" validator-required="{{required}}" validator-group="{{formName}}"/>
@@ -165,6 +176,10 @@ angular.module 'builder.components', ['form', 'validator.rules']
                     <label class='control-label'>Options</label>
                     <textarea class="form-control" rows="3" ng-model="optionsText"/>
                 </div>
+                <div class="form-group">
+                    <label class='control-label'>ngShow</label>
+                    <input type='text' ng-model="show" class='form-control'/>
+                </div>
                 <div class="checkbox">
                     <label>
                         <input type='checkbox' ng-model="required" />
@@ -188,9 +203,10 @@ angular.module 'builder.components', ['form', 'validator.rules']
         description: 'description'
         placeholder: 'placeholder'
         required: no
+        show: 'true'
         template:
             """
-            <div class="form-group">
+            <div class="form-group" builder-show="show">
                 <label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}">{{label}}</label>
                 <div class="col-sm-8">
                     <label><input type='checkbox' ng-model="inputText"/>
@@ -214,6 +230,10 @@ angular.module 'builder.components', ['form', 'validator.rules']
                 <div class="form-group">
                     <label class='control-label'>Description</label>
                     <input type='text' ng-model="description" class='form-control'/>
+                </div>
+                <div class="form-group">
+                    <label class='control-label'>ngShow</label>
+                    <input type='text' ng-model="show" class='form-control'/>
                 </div>
                 <div class="checkbox">
                     <label>
@@ -241,10 +261,11 @@ angular.module 'builder.components', ['form', 'validator.rules']
         description: 'description'
         placeholder: 'placeholder'
         required: no
+        show: 'true'
         options: ['value one', 'value two']
         template:
             """
-            <div class="form-group">
+            <div class="form-group" builder-show="show">
                 <label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}">{{label}}</label>
                 <div class="col-sm-8">
                     <div class='radio' ng-repeat="item in options track by $index">
@@ -275,6 +296,10 @@ angular.module 'builder.components', ['form', 'validator.rules']
                     <label class='control-label'>Options</label>
                     <textarea class="form-control" rows="3" ng-model="optionsText"/>
                 </div>
+                <div class="form-group">
+                    <label class='control-label'>ngShow</label>
+                    <input type='text' ng-model="show" class='form-control'/>
+                </div>
 
                 <hr/>
                 <div class='form-group'>
@@ -295,10 +320,11 @@ angular.module 'builder.components', ['form', 'validator.rules']
         description: 'description'
         placeholder: 'placeholder'
         required: no
+        show: 'true'
         options: ['value one', 'value two']
         template:
             """
-            <div class="form-group">
+            <div class="form-group" builder-show="show">
                 <label for="{{formName+index}}" class="col-sm-4 control-label">{{label}}</label>
                 <div class="col-sm-8">
                     <select ng-options="value for value in options" id="{{formName+index}}" class="form-control"
@@ -325,6 +351,10 @@ angular.module 'builder.components', ['form', 'validator.rules']
                 <div class="form-group">
                     <label class='control-label'>Options</label>
                     <textarea class="form-control" rows="3" ng-model="optionsText"/>
+                </div>
+                <div class="form-group">
+                    <label class='control-label'>ngShow</label>
+                    <input type='text' ng-model="show" class='form-control'/>
                 </div>
 
                 <hr/>

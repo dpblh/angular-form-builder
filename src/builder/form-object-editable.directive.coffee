@@ -163,17 +163,19 @@ angular.module 'builder'
 
         $scope.optionsText = formObject.options.join '\n'
 
-        $scope.$watch '[modelName, label, description, placeholder, required, options, validation, someOptions]', ->
+        $scope.$watch '[modelName, label, description, placeholder, show, required, options, validation, someOptions]', ->
             formObject.modelName = $scope.modelName
             formObject.label = $scope.label
             formObject.description = $scope.description
             formObject.placeholder = $scope.placeholder
             formObject.required = $scope.required
+            formObject.show = $scope.show
             formObject.options = $scope.options
             formObject.validation = $scope.validation
             formObject.someOptions = $scope.someOptions
         , yes
 
+#        TODO проверить
         $scope.$watch 'optionsText', (text) ->
             $scope.options = (x for x in text.split('\n') when x.length > 0)
             $scope.inputText = $scope.options[0]
@@ -193,6 +195,7 @@ angular.module 'builder'
                 description: $scope.description
                 placeholder: $scope.placeholder
                 required: $scope.required
+                show: $scope.show
                 optionsText: $scope.optionsText
                 validation: $scope.validation
                 someOptions: angular.copy $scope.someOptions
@@ -206,6 +209,7 @@ angular.module 'builder'
             $scope.description = @model.description
             $scope.placeholder = @model.placeholder
             $scope.required = @model.required
+            $scope.show = @model.show
             $scope.optionsText = @model.optionsText
             $scope.validation = @model.validation
             $scope.someOptions = @model.someOptions
