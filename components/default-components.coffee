@@ -1,4 +1,4 @@
-angular.module 'builder.components', ['builder', 'validator.rules']
+angular.module 'builder.components', ['form', 'validator.rules']
 
 .config ['$builderProvider', ($builderProvider) ->
     # ----------------------------------------

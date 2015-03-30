@@ -15,7 +15,10 @@ module.exports = (grunt) ->
         coffee:
             source:
                 files:
-                    'dist/angular-form-builder.js': ['src/*.coffee']
+                    'dist/angular-form-builder.js': ['src/builder/module.coffee', 'src/form/module.coffee','src/**/*.coffee']
+            lightSource:
+                files:
+                    'dist/angular-form-builder-light.js': ['src/form/module.coffee', 'src/provider.coffee', 'src/services.coffee', 'src/form/*.coffee']
             components:
                 files:
                     'dist/angular-form-builder-components.js': ['components/*.coffee']
@@ -27,6 +30,7 @@ module.exports = (grunt) ->
             build:
                 files:
                     'dist/angular-form-builder.min.js': 'dist/angular-form-builder.js'
+                    'dist/angular-form-builder-light.min.js': 'dist/angular-form-builder-light.js'
                     'dist/angular-form-builder-components.min.js': 'dist/angular-form-builder-components.js'
 
         watch:
@@ -37,7 +41,7 @@ module.exports = (grunt) ->
                 files: ['example/*.scss', 'src/*.scss']
                 tasks: ['compass']
             coffee:
-                files: ['src/*.coffee', 'components/*.coffee', 'example/*.coffee']
+                files: ['src/**/*.coffee', 'components/*.coffee', 'example/*.coffee']
                 tasks: ['coffee']
 
         connect:
