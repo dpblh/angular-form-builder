@@ -6,3 +6,18 @@ body{padding:10px}.footer{height:50px}
 .popover {
     max-width: none !important;
 }
+
+.fb-form-object-editable {
+
+    border: 1px solid #cccccc;
+    border-radius: 2px;
+
+}
+.fb-form-object-editable:before {
+    content: 'component';
+    background-color: #cccccc;
+    width: 100%;
+    display: block;
+    font-size: 10px;
+    padding-left: 2px;
+}

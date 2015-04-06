@@ -69,6 +69,7 @@ angular.module 'builder.provider', ['builder.services']
         result =
             id: formObject.id || utilsBuilder.guid()
             component: formObject.component
+            modelName: formObject.modelName
             editable: formObject.editable ? component.editable
             index: formObject.index ? 0
             label: formObject.label ? component.label

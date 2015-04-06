@@ -91,8 +91,7 @@ angular.module 'builder'
                             if newIndex >= formObject.index and currentForm
                                 newIndex -= 1
                         $builder.removeFormObject formObject.removed, formObject.index
-                        $builder.insertFormObject scope.formName, newIndex,
-                            component: formObject.component
+                        $builder.insertFormObject scope.formName, newIndex, formObject
                 else if isHover and draggable.mode is 'mirror'
                     # insert a form object
                     $builder.insertFormObject scope.formName, $(element).find('.empty').index(),
