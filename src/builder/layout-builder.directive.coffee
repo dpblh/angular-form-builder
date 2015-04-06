@@ -4,14 +4,14 @@ angular.module 'builder'
 # ----------------------------------------
 # fb-layout-builder
 # ----------------------------------------
-.directive 'fbLayoutBuilder', ['$builder', '$compile', 'utilsBuilder', ($builder, $compile, utilsBuilder) ->
+.directive 'fbLayoutBuilder', ['$builder', '$compile', 'utilsBuilder', '$drag', ($builder, $compile, utilsBuilder, $drag) ->
     fbLayoutBuilder =
         restrict: 'A',
         scope:
             layout: '=fbLayoutBuilder'
         template:
             """
-            <div class="panel panel-default" style='position: relative;'>
+            <div class="panel panel-default layout" style='position: relative;'>
                 <div class="panel-heading">
                     <h3 class="panel-title">Builder</h3>
                 </div>
@@ -76,7 +76,8 @@ angular.module 'builder'
                 container: 'body'
                 placement: 'right'
 
-            scope.showSettings = no
+            $(element).on 'show.bs.popover', ->
+                return no if $drag.isMouseMoved()
 
             scope.removeRow = (row) ->
                 scope.layout.rows.splice scope.layout.rows.indexOf(row), 1

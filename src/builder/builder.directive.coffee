@@ -73,28 +73,29 @@ angular.module 'builder'
                     beginMove = no
 
                 $(element).find('.empty').remove()
-            up: (e, isHover, draggable) ->
+            up: (e, isHover, draggable, remove, currentForm) ->
                 beginMove = yes
                 if not $drag.isMouseMoved()
                     # click event
                     $(element).find('.empty').remove()
                     return
 
-                if not isHover and draggable.mode is 'drag'
-                    # remove the form object by draggin out
+                if draggable.mode is 'drag'
                     formObject = draggable.object.formObject
-                    if formObject.editable
-                        $builder.removeFormObject scope.formName, formObject.index
-                else if isHover
-                    if draggable.mode is 'mirror'
-                        # insert a form object
-                        $builder.insertFormObject scope.formName, $(element).find('.empty').index(),
-                            component: draggable.object.componentName
-                    if draggable.mode is 'drag'
-                        # update the index of form objects
-                        oldIndex = draggable.object.formObject.index
+                    if remove and formObject.editable
+                        formObject.removed = scope.formName
+                        return
+                    else if formObject.editable and formObject.removed
                         newIndex = $(element).find('.empty').index()
-                        newIndex-- if oldIndex < newIndex
-                        $builder.updateFormObjectIndex scope.formName, oldIndex, newIndex
+                        if newIndex != -1
+                            if newIndex >= formObject.index and currentForm
+                                newIndex -= 1
+                        $builder.removeFormObject formObject.removed, formObject.index
+                        $builder.insertFormObject scope.formName, newIndex,
+                            component: formObject.component
+                else if isHover and draggable.mode is 'mirror'
+                    # insert a form object
+                    $builder.insertFormObject scope.formName, $(element).find('.empty').index(),
+                        component: draggable.object.componentName
                 $(element).find('.empty').remove()
 ]

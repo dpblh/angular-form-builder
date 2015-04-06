@@ -30,15 +30,21 @@ angular.module 'builder.drag', []
     @eventMouseMove = ->
     @eventMouseUp = ->
     $ =>
+        prevX = null
         $(document).on 'mousedown', (e) =>
+            @mouseDown = yes
             @mouseMoved = no
             func(e) for key, func of @hooks.down
             return
         $(document).on 'mousemove', (e) =>
+            return no if not @mouseDown
+            if not prevX or prevX is e.clientX
+                return prevX = e.clientX
             @mouseMoved = yes
             func(e) for key, func of @hooks.move
             return
         $(document).on 'mouseup', (e) =>
+            @mouseDown = no
             func(e) for key, func of @hooks.up
             return
 
@@ -220,9 +226,19 @@ angular.module 'builder.drag', []
                 return
             @hooks.up.drag = (e) =>
                 # execute callback for droppables
-                for id, droppable of @data.droppables when droppable.element.contains e.target
-                    isHover = @isHover $element, $(droppable.element)
-                    droppable.up e, isHover, result
+                dropped =
+                    from:null
+                    to:null
+                for id, droppable of @data.droppables
+                    dropped.from = droppable if droppable.element.contains e.target
+                    dropped.to = droppable if @isHover $element, $(droppable.element)
+
+                hover = dropped.from and @isHover($element, $(dropped.from.element))
+                currentForm = dropped.to and dropped.to.element.contains e.target
+
+                dropped.from.up e, hover, result, yes if dropped.from
+                dropped.to.up e, yes, result, no, currentForm if dropped.to
+                delete result.object.formObject.removed
 
                 delete @hooks.move.drag
                 delete @hooks.up.drag
@@ -242,8 +258,8 @@ angular.module 'builder.drag', []
             element: $element[0]
             move: (e, draggable) ->
                 $rootScope.$apply -> options.move?(e, draggable)
-            up: (e, isHover, draggable) ->
-                $rootScope.$apply -> options.up?(e, isHover, draggable)
+            up: (e, isHover, draggable, remove, currentForm) ->
+                $rootScope.$apply -> options.up?(e, isHover, draggable, remove, currentForm)
             out: (e, draggable) ->
                 $rootScope.$apply -> options.out?(e, draggable)
         result

@@ -103,7 +103,7 @@ angular.module 'builder'
         $(element).on 'show.bs.popover', ->
             return no if $drag.isMouseMoved()
             # hide other popovers
-            $("div.fb-form-object-editable:not(.#{popover.id})").popover 'hide'
+            $("div.fb-form-object-editable:not(.#{popover.id}), div.layout").popover 'hide'
 
             $popover = $("form.#{popover.id}").closest '.popover'
             if $popover.length > 0
