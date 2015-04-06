@@ -72,32 +72,34 @@
               }
               return $(element).find('.empty').remove();
             },
-            up: function(e, isHover, draggable) {
-              var formObject, newIndex, oldIndex;
+            up: function(e, isHover, draggable, remove, currentForm) {
+              var formObject, newIndex;
               beginMove = true;
               if (!$drag.isMouseMoved()) {
                 $(element).find('.empty').remove();
                 return;
               }
-              if (!isHover && draggable.mode === 'drag') {
+              if (draggable.mode === 'drag') {
                 formObject = draggable.object.formObject;
-                if (formObject.editable) {
-                  $builder.removeFormObject(scope.formName, formObject.index);
-                }
-              } else if (isHover) {
-                if (draggable.mode === 'mirror') {
-                  $builder.insertFormObject(scope.formName, $(element).find('.empty').index(), {
-                    component: draggable.object.componentName
+                if (remove && formObject.editable) {
+                  formObject.removed = scope.formName;
+                  return;
+                } else if (formObject.editable && formObject.removed) {
+                  newIndex = $(element).find('.empty').index();
+                  if (newIndex !== -1) {
+                    if (newIndex >= formObject.index && currentForm) {
+                      newIndex -= 1;
+                    }
+                  }
+                  $builder.removeFormObject(formObject.removed, formObject.index);
+                  $builder.insertFormObject(scope.formName, newIndex, {
+                    component: formObject.component
                   });
                 }
-                if (draggable.mode === 'drag') {
-                  oldIndex = draggable.object.formObject.index;
-                  newIndex = $(element).find('.empty').index();
-                  if (oldIndex < newIndex) {
-                    newIndex--;
-                  }
-                  $builder.updateFormObjectIndex(scope.formName, oldIndex, newIndex);
-                }
+              } else if (isHover && draggable.mode === 'mirror') {
+                $builder.insertFormObject(scope.formName, $(element).find('.empty').index(), {
+                  component: draggable.object.componentName
+                });
               }
               return $(element).find('.empty').remove();
             }
@@ -215,8 +217,11 @@
     this.eventMouseUp = function() {};
     $((function(_this) {
       return function() {
+        var prevX;
+        prevX = null;
         $(document).on('mousedown', function(e) {
           var func, key, _ref;
+          _this.mouseDown = true;
           _this.mouseMoved = false;
           _ref = _this.hooks.down;
           for (key in _ref) {
@@ -226,6 +231,12 @@
         });
         $(document).on('mousemove', function(e) {
           var func, key, _ref;
+          if (!_this.mouseDown) {
+            return false;
+          }
+          if (!prevX || prevX === e.clientX) {
+            return prevX = e.clientX;
+          }
           _this.mouseMoved = true;
           _ref = _this.hooks.move;
           for (key in _ref) {
@@ -235,6 +246,7 @@
         });
         return $(document).on('mouseup', function(e) {
           var func, key, _ref;
+          _this.mouseDown = false;
           _ref = _this.hooks.up;
           for (key in _ref) {
             func = _ref[key];
@@ -475,16 +487,30 @@
             }
           };
           _this.hooks.up.drag = function(e) {
-            var droppable, id, isHover, _ref;
+            var currentForm, droppable, dropped, hover, id, _ref;
+            dropped = {
+              from: null,
+              to: null
+            };
             _ref = _this.data.droppables;
             for (id in _ref) {
               droppable = _ref[id];
-              if (!(droppable.element.contains(e.target))) {
-                continue;
+              if (droppable.element.contains(e.target)) {
+                dropped.from = droppable;
               }
-              isHover = _this.isHover($element, $(droppable.element));
-              droppable.up(e, isHover, result);
+              if (_this.isHover($element, $(droppable.element))) {
+                dropped.to = droppable;
+              }
             }
+            hover = dropped.from && _this.isHover($element, $(dropped.from.element));
+            currentForm = dropped.to && dropped.to.element.contains(e.target);
+            if (dropped.from) {
+              dropped.from.up(e, hover, result, true);
+            }
+            if (dropped.to) {
+              dropped.to.up(e, true, result, false, currentForm);
+            }
+            delete result.object.formObject.removed;
             delete _this.hooks.move.drag;
             delete _this.hooks.up.drag;
             $element.css({
@@ -514,9 +540,9 @@
               return typeof options.move === "function" ? options.move(e, draggable) : void 0;
             });
           },
-          up: function(e, isHover, draggable) {
+          up: function(e, isHover, draggable, remove, currentForm) {
             return $rootScope.$apply(function() {
-              return typeof options.up === "function" ? options.up(e, isHover, draggable) : void 0;
+              return typeof options.up === "function" ? options.up(e, isHover, draggable, remove, currentForm) : void 0;
             });
           },
           out: function(e, draggable) {
@@ -711,7 +737,7 @@
             if ($drag.isMouseMoved()) {
               return false;
             }
-            $("div.fb-form-object-editable:not(." + popover.id + ")").popover('hide');
+            $("div.fb-form-object-editable:not(." + popover.id + "), div.layout").popover('hide');
             $popover = $("form." + popover.id).closest('.popover');
             if ($popover.length > 0) {
               elementOrigin = $(element).offset().top + $(element).height() / 2;
@@ -847,14 +873,14 @@
 
 (function() {
   angular.module('builder').directive('fbLayoutBuilder', [
-    '$builder', '$compile', 'utilsBuilder', function($builder, $compile, utilsBuilder) {
+    '$builder', '$compile', 'utilsBuilder', '$drag', function($builder, $compile, utilsBuilder, $drag) {
       var fbLayoutBuilder;
       fbLayoutBuilder = {
         restrict: 'A',
         scope: {
           layout: '=fbLayoutBuilder'
         },
-        template: "<div class=\"panel panel-default\" style='position: relative;'>\n    <div class=\"panel-heading\">\n        <h3 class=\"panel-title\">Builder</h3>\n    </div>\n    <div class=\"container-fluid\">\n        <div class=\"row\" ng-repeat=\"row in layout.rows\">\n            <legend ng-if=\"row.label\" ng-bind=\"row.label\"></legend>\n            <div class=\"col-md-{{column.width}}\" ng-repeat=\"column in row.columns\">\n                <div fb-builder=\"column.formData.views\" form-name=\"{{$parent.$index + '' + $index}}\"></div>\n            </div>\n        </div>\n    </div>\n\n</div>\n",
+        template: "<div class=\"panel panel-default layout\" style='position: relative;'>\n    <div class=\"panel-heading\">\n        <h3 class=\"panel-title\">Builder</h3>\n    </div>\n    <div class=\"container-fluid\">\n        <div class=\"row\" ng-repeat=\"row in layout.rows\">\n            <legend ng-if=\"row.label\" ng-bind=\"row.label\"></legend>\n            <div class=\"col-md-{{column.width}}\" ng-repeat=\"column in row.columns\">\n                <div fb-builder=\"column.formData.views\" form-name=\"{{$parent.$index + '' + $index}}\"></div>\n            </div>\n        </div>\n    </div>\n\n</div>\n",
         templatePopover: "<form role=\"form\" class='form-horizontal'>\n\n    <div ng-repeat='row in layout.rows'>\n        <div class=\"form-group\">\n            <label class='col-lg-4 control-label' ng-click=\"removeRow(row)\"><span style='color: red'>x</span> удалить строку</label>\n        </div>\n        <div class=\"form-group\">\n            <label class='col-lg-4 control-label'>Наименование строки</label>\n            <div class='col-lg-8'>\n                <input type='text' class='form-control col-lg-8' ng-model='row.label'/>\n            </div>\n\n        </div>\n        <div class=\"form-group\">\n\n                <div class='col-lg-3' ng-repeat='column in row.columns'>\n                    <input type='text' class='form-control' ng-model='column.width'/>\n                    <label class='col-lg-1 control-label' ng-click='removeColumn(row, column)'><span style='color: red'>x</span></label>\n                </div>\n\n                <label class='btn btn-default' ng-click='addColumn(row)'>+</label>\n        </div>\n    </div>\n\n    <label class='btn btn-default' ng-click='addRow()'>+</label>\n</form>",
         link: function(scope, element) {
           var rebuild, viewPopover;
@@ -892,7 +918,11 @@
             container: 'body',
             placement: 'right'
           });
-          scope.showSettings = false;
+          $(element).on('show.bs.popover', function() {
+            if ($drag.isMouseMoved()) {
+              return false;
+            }
+          });
           scope.removeRow = function(row) {
             return scope.layout.rows.splice(scope.layout.rows.indexOf(row), 1);
           };
