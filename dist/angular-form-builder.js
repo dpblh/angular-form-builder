@@ -92,9 +92,7 @@
                     }
                   }
                   $builder.removeFormObject(formObject.removed, formObject.index);
-                  $builder.insertFormObject(scope.formName, newIndex, {
-                    component: formObject.component
-                  });
+                  $builder.insertFormObject(scope.formName, newIndex, formObject);
                 }
               } else if (isHover && draggable.mode === 'mirror') {
                 $builder.insertFormObject(scope.formName, $(element).find('.empty').index(), {
@@ -1344,6 +1342,7 @@
       result = {
         id: formObject.id || utilsBuilder.guid(),
         component: formObject.component,
+        modelName: formObject.modelName,
         editable: (_ref = formObject.editable) != null ? _ref : component.editable,
         index: (_ref1 = formObject.index) != null ? _ref1 : 0,
         label: (_ref2 = formObject.label) != null ? _ref2 : component.label,
