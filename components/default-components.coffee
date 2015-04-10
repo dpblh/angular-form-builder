@@ -1,6 +1,17 @@
 angular.module 'builder.components', ['form', 'validator.rules']
 
-.config ['$builderProvider', ($builderProvider) ->
+.config ['$builderProvider', 'rulesProvider', '$validatorProvider', ($builderProvider, rulesProvider, $validatorProvider) ->
+
+    rulesProvider.register 'none', '/.*/'
+    rulesProvider.register 'default', '[default]'
+    rulesProvider.register 'number', '[number, default]'
+    rulesProvider.register 'email', '[email, default]'
+    rulesProvider.register 'url', '[url, default]'
+
+    $validatorProvider.register 'default',
+        validator: -> no
+        error: ''
+
     # ----------------------------------------
     # text input
     # ----------------------------------------
@@ -12,12 +23,7 @@ angular.module 'builder.components', ['form', 'validator.rules']
         placeholder: 'placeholder'
         required: no
         show: 'true'
-        validationOptions: [
-            {label: 'none', rule: '/.*/'}
-            {label: 'number', rule: '[number]'}
-            {label: 'email', rule: '[email]'}
-            {label: 'url', rule: '[url]'}
-        ]
+        validationOptions: rulesProvider.rules
         template:
             """
             <div class="form-group" builder-show="show">
@@ -86,7 +92,7 @@ angular.module 'builder.components', ['form', 'validator.rules']
             <div class="form-group" builder-show="show">
                 <label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}">{{label}}</label>
                 <div class="col-sm-8">
-                    <textarea type="text" ng-model="inputText" validator-required="{{required}}" validator-group="{{formName}}" id="{{formName+index}}" class="form-control" rows='6' placeholder="{{placeholder}}"/>
+                    <textarea type="text" ng-model="inputText" validator-required="{{required}}" validator="[default]" validator-group="{{formName}}" id="{{formName+index}}" class="form-control" rows='6' placeholder="{{placeholder}}"/>
                     <p class='help-block' ng-if='description'>{{description}}</p>
                 </div>
             </div>
@@ -147,7 +153,7 @@ angular.module 'builder.components', ['form', 'validator.rules']
             <div class="form-group" builder-show="show">
                 <label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}">{{label}}</label>
                 <div class="col-sm-8">
-                    <input type='hidden' ng-model="inputText" validator-required="{{required}}" validator-group="{{formName}}"/>
+                    <input type='hidden' ng-model="inputText" validator-required="{{required}}" validator="[default]" validator-group="{{formName}}"/>
                     <div class='checkbox' ng-repeat="item in options track by $index">
                         <label><input type='checkbox' ng-model="$parent.inputArray[$index]" ng-checked='$parent.inputArray[$index]' value='item'/>
                             {{item}}
@@ -209,7 +215,7 @@ angular.module 'builder.components', ['form', 'validator.rules']
             <div class="form-group" builder-show="show">
                 <label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}">{{label}}</label>
                 <div class="col-sm-8">
-                    <label><input type='checkbox' ng-model="inputText"/>
+                    <label><input type='checkbox' validator="[default]" ng-model="inputText"/>
                         {{item}}
                     </label>
                     <p class='help-block' ng-if='description'>{{description}}</p>
@@ -269,7 +275,7 @@ angular.module 'builder.components', ['form', 'validator.rules']
                 <label for="{{formName+index}}" class="col-sm-4 control-label" ng-class="{'fb-required':required}">{{label}}</label>
                 <div class="col-sm-8">
                     <div class='radio' ng-repeat="item in options track by $index">
-                        <label><input name='{{formName+index}}' ng-model="$parent.inputText" validator-group="{{formName}}" value='{{item}}' type='radio'/>
+                        <label><input name='{{formName+index}}' ng-model="$parent.inputText" validator-group="{{formName}}" validator="[default]" value='{{item}}' type='radio'/>
                             {{item}}
                         </label>
                     </div>
@@ -328,7 +334,7 @@ angular.module 'builder.components', ['form', 'validator.rules']
                 <label for="{{formName+index}}" class="col-sm-4 control-label">{{label}}</label>
                 <div class="col-sm-8">
                     <select ng-options="value for value in options" id="{{formName+index}}" class="form-control"
-                        ng-model="inputText" ng-init="inputText = options[0]"/>
+                        ng-model="inputText" validator="[default]" ng-init="inputText = options[0]"/>
                     <p class='help-block' ng-if='description'>{{description}}</p>
                 </div>
             </div>

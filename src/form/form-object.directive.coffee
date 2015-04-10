@@ -67,11 +67,11 @@ angular.module 'form'
         scope.$watch '$component.template', (template) ->
             return if not template
             # add validator
-            $input = element.find "[ng-model='inputText']"
+            element.html template
+            $input = element.find "input"
             $input.attr
                 validator: '{{validation}}'
             # compile
-            element.html template
             $compile(element.contents()) scope
 
         # select the first option
