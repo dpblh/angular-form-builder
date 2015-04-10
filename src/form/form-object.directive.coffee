@@ -18,6 +18,7 @@ angular.module 'form'
         # variables
         # ----------------------------------------
         scope.formObject = $parse(attrs.fbFormObject) scope
+        scope.validationGroup = 'default'
         scope.$component = $builder.components[scope.formObject.component]
 
         # ----------------------------------------

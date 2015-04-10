@@ -127,7 +127,7 @@ angular.module 'app', ['builder', 'builder.components', 'validator.rules']
 
 
     $scope.submit = ->
-        $validator.validate $scope, 'personal'
+        $validator.validate $scope, 'default'
         .success -> console.log 'success'
         .error -> console.log 'error'
 ]
