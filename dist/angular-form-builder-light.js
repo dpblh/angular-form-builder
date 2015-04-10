@@ -416,11 +416,11 @@
             if (!template) {
               return;
             }
-            $input = element.find("[ng-model='inputText']");
+            element.html(template);
+            $input = element.find("input");
             $input.attr({
               validator: '{{validation}}'
             });
-            element.html(template);
             return $compile(element.contents())(scope);
           });
           if (!scope.$component.arrayToText && scope.formObject.options.length > 0) {
@@ -564,6 +564,29 @@
       };
     }
   ]);
+
+}).call(this);
+
+
+/*
+  rules service
+ */
+
+(function() {
+  angular.module('form').provider('rules', function() {
+    return {
+      $get: function() {
+        return this.rules;
+      },
+      rules: [],
+      register: function(label, rule) {
+        return this.rules.push({
+          label: label,
+          rule: rule
+        });
+      }
+    };
+  });
 
 }).call(this);
 

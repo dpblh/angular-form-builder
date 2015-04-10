@@ -70,7 +70,7 @@
                       "placeholder": "placeholder",
                       "options": [],
                       "required": false,
-                      "validation": "/.*/",
+                      "validation": "[default]",
                       "modelName": "personal.data.middleName"
                     }, {
                       "id": "8e3e143c-40ea-e61d-e051-c81ce1be2ab1",
@@ -126,7 +126,7 @@
         }
       };
       return $scope.submit = function() {
-        return $validator.validate($scope, 'default').success(function() {
+        return $validator.validate($scope, 'personal').success(function() {
           return console.log('success');
         }).error(function() {
           return console.log('error');
