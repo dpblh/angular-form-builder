@@ -1,5 +1,5 @@
 'use strict';
-angular.module 'builder.directive', []
+angular.module 'builder.directive'
 
 .directive 'builderShow', ['$parse', ($parse) ->
 

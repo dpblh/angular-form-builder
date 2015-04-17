@@ -70,10 +70,12 @@ angular.module 'app', ['builder', 'builder.components', 'validator.rules']
 ]
 
 
-.controller 'DemoController', ['$scope', '$builder', '$validator', '$timeout', ($scope, $builder, $validator, $timeout) ->
+.controller 'DemoController', ['$scope', '$builder', '$validator', '$timeout', '$rootScope', ($scope, $builder, $validator, $timeout, $rootScope) ->
     # ----------------------------------------
     # builder
     # ----------------------------------------
+
+    $rootScope.formScope = $scope
 
 #    $timeout( ->
     $scope.layout = {

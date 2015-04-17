@@ -371,4 +371,54 @@ angular.module 'builder.components', ['form', 'validator.rules']
                 </div>
             </form>
             """
+
+    # ----------------------------------------
+    # select
+    # ----------------------------------------
+    $builderProvider.registerComponent 'button',
+        group: 'Default'
+        label: 'submit'
+        show: 'true'
+        someObject:
+            source: 'submit()'
+            color: 'btn-default'
+            colorOptions: [
+                {label: 'default', color: 'btn-default'}
+                {label: 'primary', color: 'btn-primary'}
+            ]
+        template:
+            """
+            <div builder-show="show">
+                <builder-button label="{{label}}" source="{{someObject.source}}" color="{{someObject.color}}"></builder-button>
+            </div>
+
+            """
+        popoverTemplate:
+            """
+            <form>
+                <div class="form-group">
+                    <label class='control-label'>Label</label>
+                    <input type='text' ng-model="label" validator="[required]" class='form-control'/>
+                </div>
+                <div class="form-group">
+                    <label class='control-label'>source</label>
+                    <input type='text' ng-model="someObject.source" class='form-control'/>
+                </div>
+                <div class="form-group">
+                    <label class='control-label'>color</label>
+                    <select ng-model="someObject.color" class='form-control' ng-options="option.color as option.label for option in someObject.colorOptions"></select>
+                </div>
+                <div class="form-group">
+                    <label class='control-label'>ngShow</label>
+                    <input type='text' ng-model="show" class='form-control'/>
+                </div>
+
+                <hr/>
+                <div class='form-group'>
+                    <input type='submit' ng-click="popover.save($event)" class='btn btn-primary' value='Save'/>
+                    <input type='button' ng-click="popover.cancel($event)" class='btn btn-default' value='Cancel'/>
+                    <input type='button' ng-click="popover.remove($event)" class='btn btn-danger' value='Delete'/>
+                </div>
+            </form>
+            """
 ]
