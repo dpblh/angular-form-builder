@@ -1,4 +1,6 @@
 (function() {
+  angular.module('builder.directive', []);
+
   angular.module('form', ['builder.directive', 'builder.provider', 'builder.services', 'validator']);
 
 }).call(this);
@@ -50,7 +52,7 @@
         show: (_ref6 = component.show) != null ? _ref6 : 'true',
         validation: (_ref7 = component.validation) != null ? _ref7 : '/.*/',
         validationOptions: (_ref8 = component.validationOptions) != null ? _ref8 : [],
-        someOptions: (_ref9 = component.someOptions) != null ? _ref9 : {},
+        someObject: (_ref9 = component.someObject) != null ? _ref9 : {},
         options: (_ref10 = component.options) != null ? _ref10 : [],
         arrayToText: (_ref11 = component.arrayToText) != null ? _ref11 : false,
         template: component.template,
@@ -85,7 +87,7 @@
         description: (_ref3 = formObject.description) != null ? _ref3 : component.description,
         placeholder: (_ref4 = formObject.placeholder) != null ? _ref4 : component.placeholder,
         options: (_ref5 = formObject.options) != null ? _ref5 : component.options,
-        someOptions: (_ref6 = formObject.someOptions) != null ? _ref6 : {},
+        someObject: (_ref6 = formObject.someObject) != null ? _ref6 : angular.copy(component.someObject),
         required: (_ref7 = formObject.required) != null ? _ref7 : component.required,
         show: (_ref8 = formObject.show) != null ? _ref8 : component.show,
         validation: (_ref9 = formObject.validation) != null ? _ref9 : component.validation
@@ -334,6 +336,30 @@
 }).call(this);
 
 (function() {
+  'use strict';
+  angular.module('builder.directive').directive('builderButton', [
+    '$rootScope', function($rootScope) {
+      return {
+        restrict: 'E',
+        scope: {
+          source: '@',
+          label: '@',
+          color: '@'
+        },
+        replace: true,
+        template: '<label class="btn {{color}} btn-form" ng-click="click()" ng-bind="label"></label>',
+        link: function(scope) {
+          return scope.click = function() {
+            return $rootScope.formScope.$eval(scope.source);
+          };
+        }
+      };
+    }
+  ]);
+
+}).call(this);
+
+(function() {
   angular.module('form').directive('fbFormObject', [
     '$injector', function($injector) {
       var $builder, $compile, $parse, $timeout;
@@ -347,6 +373,7 @@
         link: function(scope, element, attrs) {
           var initValue;
           scope.formObject = $parse(attrs.fbFormObject)(scope);
+          scope.validationGroup = 'default';
           scope.$component = $builder.components[scope.formObject.component];
           scope.$on($builder.broadcastChannel.updateInput, function() {
             return scope.updateInput(scope.inputText);
@@ -527,19 +554,29 @@
           output: '=fbOutput',
           input: '=fbInput'
         },
-        template: "<div class=\"container-fluid\">\n    <div class='row' ng-repeat=\"row in layout.rows\">\n        <legend ng-if=\"row.label\" ng-bind=\"row.label\"></legend>\n        <div class=\"col-md-{{column.width}}\" ng-repeat=\"column in row.columns\">\n            <div ng-model=\"output\" fb-form=\"{{$parent.$index + '' + $index}}\" fb-default=\"input\"></div>\n        </div>\n    </div>\n</div>\n",
+        template: "<div class=\"container-fluid\">\n    <ul class=\"nav nav-tabs nav-justified\" ng-show='layout.tabs.length > 1'>\n        <li ng-repeat=\"tab in layout.tabs\" ng-class=\"{active:rows == tab.rows}\">\n            <a href='#' ng-click=\"selectTab($event, tab)\">{{tab.label}}</a>\n        </li>\n    </ul>\n    <div class='row' ng-repeat=\"row in rows\">\n        <legend ng-if=\"row.label\" ng-bind=\"row.label\"></legend>\n        <div class=\"col-md-{{column.width}}\" ng-repeat=\"column in row.columns\">\n            <div ng-model=\"output\" fb-form=\"{{$parent.$index + '' + $index}}\" fb-default=\"input\"></div>\n        </div>\n    </div>\n</div>\n",
         link: function(scope) {
           var rebuild;
           scope.defaultValue = {};
           if (scope.output == null) {
             scope.output = {};
           }
+          scope.rows = scope.layout.tabs[0].rows;
+          scope.selectTab = function($event, tab) {
+            if ($event != null) {
+              $event.preventDefault();
+            }
+            if ($event != null) {
+              $event.stopPropagation();
+            }
+            return scope.rows = tab.rows;
+          };
           rebuild = function() {
             var column, i, j, row, _i, _len, _ref, _results;
-            if (!scope.layout || !scope.layout.rows) {
+            if (!scope.rows) {
               return;
             }
-            _ref = scope.layout.rows;
+            _ref = scope.rows;
             _results = [];
             for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
               row = _ref[i];
@@ -556,7 +593,7 @@
             }
             return _results;
           };
-          scope.$watch('layout', function() {
+          scope.$watch('rows', function() {
             return rebuild();
           });
           return rebuild();
@@ -592,7 +629,7 @@
 
 (function() {
   'use strict';
-  angular.module('builder.directive', []).directive('builderShow', [
+  angular.module('builder.directive').directive('builderShow', [
     '$parse', function($parse) {
       return {
         restrict: 'A',

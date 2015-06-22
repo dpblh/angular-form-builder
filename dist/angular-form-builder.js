@@ -4,6 +4,8 @@
 }).call(this);
 
 (function() {
+  angular.module('builder.directive', []);
+
   angular.module('form', ['builder.directive', 'builder.provider', 'builder.services', 'validator']);
 
 }).call(this);
@@ -878,16 +880,26 @@
         scope: {
           layout: '=fbLayoutBuilder'
         },
-        template: "<div class=\"panel panel-default layout\" style='position: relative;'>\n    <div class=\"panel-heading\">\n        <h3 class=\"panel-title\">Builder</h3>\n    </div>\n    <div class=\"container-fluid\">\n        <div class=\"row\" ng-repeat=\"row in layout.rows\">\n            <legend ng-if=\"row.label\" ng-bind=\"row.label\"></legend>\n            <div class=\"col-md-{{column.width}}\" ng-repeat=\"column in row.columns\">\n                <div fb-builder=\"column.formData.views\" form-name=\"{{$parent.$index + '' + $index}}\"></div>\n            </div>\n        </div>\n    </div>\n\n</div>\n",
-        templatePopover: "<form role=\"form\" class='form-horizontal'>\n\n    <div ng-repeat='row in layout.rows'>\n        <div class=\"form-group\">\n            <label class='col-lg-4 control-label' ng-click=\"removeRow(row)\"><span style='color: red'>x</span> удалить строку</label>\n        </div>\n        <div class=\"form-group\">\n            <label class='col-lg-4 control-label'>Наименование строки</label>\n            <div class='col-lg-8'>\n                <input type='text' class='form-control col-lg-8' ng-model='row.label'/>\n            </div>\n\n        </div>\n        <div class=\"form-group\">\n\n                <div class='col-lg-3' ng-repeat='column in row.columns'>\n                    <input type='text' class='form-control' ng-model='column.width'/>\n                    <label class='col-lg-1 control-label' ng-click='removeColumn(row, column)'><span style='color: red'>x</span></label>\n                </div>\n\n                <label class='btn btn-default' ng-click='addColumn(row)'>+</label>\n        </div>\n    </div>\n\n    <label class='btn btn-default' ng-click='addRow()'>+</label>\n</form>",
+        template: "<div class=\"panel panel-default layout\" style='position: relative;'>\n    <div class=\"panel-heading\">\n        <h3 class=\"panel-title\">Builder</h3>\n    </div>\n    <div class=\"container-fluid\">\n        <ul class=\"nav nav-tabs nav-justified\">\n            <li ng-repeat=\"tab in layout.tabs\" ng-class=\"{active:rows == tab.rows}\" ng-init=\"toggleInput = false\">\n                <a href='#' ng-show='!toggleInput' ng-click=\"selectTab($event, tab)\">{{tab.label}}\n                    <span class=\"glyphicon glyphicon-remove-sign\" ng-click=\"removeTab($event, tab)\"></span>\n                    <span class=\"glyphicon glyphicon-edit\" ng-click='toggleInput = true'></span>\n                </a>\n                <div ng-show='toggleInput'>\n                    <input type=\"text\" ng-model=\"tab.label\"/>\n                    <span class=\"glyphicon glyphicon-ok\" ng-click='toggleInput = false; $event.preventDefault(); $event.stopPropagation()'></span>\n                </div>\n            </li>\n            <li ng-click=\"addTab($event)\">\n                <a href='#'><span class=\"glyphicon glyphicon-plus-sign\"></span></a>\n            </li>\n        </ul>\n        <div class=\"row\" ng-repeat=\"row in rows\">\n            <legend ng-if=\"row.label\" ng-bind=\"row.label\"></legend>\n            <div class=\"col-md-{{column.width}}\" ng-repeat=\"column in row.columns\">\n                <div fb-builder=\"column.formData.views\" form-name=\"{{$parent.$index + '' + $index}}\"></div>\n            </div>\n        </div>\n    </div>\n\n</div>\n",
+        templatePopover: "<form role=\"form\" class='form-horizontal'>\n\n    <div ng-repeat='row in rows'>\n        <div class=\"form-group\">\n            <label class='col-lg-4 control-label' ng-click=\"removeRow(row)\"><span style='color: red'>x</span> удалить строку</label>\n        </div>\n        <div class=\"form-group\">\n            <label class='col-lg-4 control-label'>Наименование строки</label>\n            <div class='col-lg-8'>\n                <input type='text' class='form-control col-lg-8' ng-model='row.label'/>\n            </div>\n\n        </div>\n        <div class=\"form-group\">\n\n                <div class='col-lg-3' ng-repeat='column in row.columns'>\n                    <input type='text' class='form-control' ng-model='column.width'/>\n                    <label class='col-lg-1 control-label' ng-click='removeColumn(row, column)'><span style='color: red'>x</span></label>\n                </div>\n\n                <label class='btn btn-default' ng-click='addColumn(row)'>+</label>\n        </div>\n    </div>\n\n    <label class='btn btn-default' ng-click='addRow()'>+</label>\n</form>",
         link: function(scope, element) {
           var rebuild, viewPopover;
+          scope.rows = scope.layout.tabs[0].rows;
+          scope.selectTab = function($event, tab) {
+            if ($event != null) {
+              $event.preventDefault();
+            }
+            if ($event != null) {
+              $event.stopPropagation();
+            }
+            return scope.rows = tab.rows;
+          };
           rebuild = function() {
             var column, i, j, row, _i, _len, _ref, _results;
-            if (!scope.layout || !scope.layout.rows) {
+            if (!scope.rows) {
               return;
             }
-            _ref = scope.layout.rows;
+            _ref = scope.rows;
             _results = [];
             for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
               row = _ref[i];
@@ -904,10 +916,9 @@
             }
             return _results;
           };
-          scope.$watch('layout', function() {
+          scope.$watch('rows', function() {
             return rebuild();
           });
-          rebuild();
           viewPopover = $compile(fbLayoutBuilder.templatePopover)(scope);
           $(element).popover({
             html: true,
@@ -922,71 +933,100 @@
             }
           });
           scope.removeRow = function(row) {
-            return scope.layout.rows.splice(scope.layout.rows.indexOf(row), 1);
+            return scope.rows.splice(scope.rows.indexOf(row), 1);
           };
           scope.removeColumn = function(row, column) {
             return row.columns.splice(row.columns.indexOf(column), 1);
           };
+          scope.removeTab = function($event, tab) {
+            var _ref;
+            if ($event != null) {
+              $event.preventDefault();
+            }
+            if ($event != null) {
+              $event.stopPropagation();
+            }
+            scope.layout.tabs.splice(scope.layout.tabs.indexOf(tab), 1);
+            return scope.rows = (_ref = scope.layout.tabs[0]) != null ? _ref.rows : void 0;
+          };
+          scope.addTab = function($event) {
+            if ($event != null) {
+              $event.preventDefault();
+            }
+            if ($event != null) {
+              $event.stopPropagation();
+            }
+            scope.layout.tabs.push({
+              label: 'new',
+              rows: [
+                {
+                  columns: [
+                    {
+                      width: 12,
+                      formData: {
+                        views: []
+                      }
+                    }
+                  ]
+                }
+              ]
+            });
+            return scope.rows = scope.layout.tabs[scope.layout.tabs.length - 1].rows;
+          };
           scope.addColumn = function(row) {
             var indexColumn, indexRow;
-            indexRow = scope.layout.rows.indexOf(row);
+            indexRow = scope.rows.indexOf(row);
             indexColumn = row.columns.length;
             row.columns.push({
               width: 12,
               formData: {
-                inputs: [],
-                name: "example",
-                views: [
-                  {
-                    "id": utilsBuilder.guid(),
-                    "component": "textInput",
-                    "editable": true,
-                    "index": 2,
-                    "label": "Text Input2",
-                    "description": "description",
-                    "placeholder": "placeholder",
-                    "options": [],
-                    "required": false,
-                    "validation": "/.*/"
-                  }
-                ]
+                views: []
               }
             });
-            return $builder.addAllFormObject("" + indexRow + indexColumn, scope.layout.rows[indexRow].columns[indexColumn].formData.views);
+            return $builder.addAllFormObject("" + indexRow + indexColumn, scope.rows[indexRow].columns[indexColumn].formData.views);
           };
           return scope.addRow = function() {
             var index;
-            index = scope.layout.rows.length;
-            scope.layout.rows.push({
+            index = scope.rows.length;
+            scope.rows.push({
               columns: [
                 {
                   width: 12,
                   formData: {
-                    inputs: [],
-                    name: "example",
-                    views: [
-                      {
-                        "id": utilsBuilder.guid(),
-                        "component": "textInput",
-                        "editable": true,
-                        "index": 2,
-                        "label": "Text Input2",
-                        "description": "description",
-                        "placeholder": "placeholder",
-                        "options": [],
-                        "required": false,
-                        "validation": "/.*/"
-                      }
-                    ]
+                    views: []
                   }
                 }
               ]
             });
-            return $builder.addAllFormObject("" + index + "0", scope.layout.rows[index].columns[0].formData.views);
+            return $builder.addAllFormObject("" + index + "0", scope.rows[index].columns[0].formData.views);
           };
         }
       };
       return fbLayoutBuilder;
+    }
+  ]);
+
+}).call(this);
+
+(function() {
+  'use strict';
+  angular.module('builder.directive').directive('builderButton', [
+    '$rootScope', function($rootScope) {
+      return {
+        restrict: 'E',
+        scope: {
+          source: '@',
+          label: '@',
+          color: '@'
+        },
+        replace: true,
+        template: '<label class="btn {{color}} btn-form" ng-click="click()" ng-bind="label"></label>',
+        link: function(scope) {
+          return scope.click = function() {
+            return $rootScope.formScope.$eval(scope.source);
+          };
+        }
+      };
     }
   ]);
 
@@ -1006,6 +1046,7 @@
         link: function(scope, element, attrs) {
           var initValue;
           scope.formObject = $parse(attrs.fbFormObject)(scope);
+          scope.validationGroup = 'default';
           scope.$component = $builder.components[scope.formObject.component];
           scope.$on($builder.broadcastChannel.updateInput, function() {
             return scope.updateInput(scope.inputText);
@@ -1186,19 +1227,29 @@
           output: '=fbOutput',
           input: '=fbInput'
         },
-        template: "<div class=\"container-fluid\">\n    <div class='row' ng-repeat=\"row in layout.rows\">\n        <legend ng-if=\"row.label\" ng-bind=\"row.label\"></legend>\n        <div class=\"col-md-{{column.width}}\" ng-repeat=\"column in row.columns\">\n            <div ng-model=\"output\" fb-form=\"{{$parent.$index + '' + $index}}\" fb-default=\"input\"></div>\n        </div>\n    </div>\n</div>\n",
+        template: "<div class=\"container-fluid\">\n    <ul class=\"nav nav-tabs nav-justified\" ng-show='layout.tabs.length > 1'>\n        <li ng-repeat=\"tab in layout.tabs\" ng-class=\"{active:rows == tab.rows}\">\n            <a href='#' ng-click=\"selectTab($event, tab)\">{{tab.label}}</a>\n        </li>\n    </ul>\n    <div class='row' ng-repeat=\"row in rows\">\n        <legend ng-if=\"row.label\" ng-bind=\"row.label\"></legend>\n        <div class=\"col-md-{{column.width}}\" ng-repeat=\"column in row.columns\">\n            <div ng-model=\"output\" fb-form=\"{{$parent.$index + '' + $index}}\" fb-default=\"input\"></div>\n        </div>\n    </div>\n</div>\n",
         link: function(scope) {
           var rebuild;
           scope.defaultValue = {};
           if (scope.output == null) {
             scope.output = {};
           }
+          scope.rows = scope.layout.tabs[0].rows;
+          scope.selectTab = function($event, tab) {
+            if ($event != null) {
+              $event.preventDefault();
+            }
+            if ($event != null) {
+              $event.stopPropagation();
+            }
+            return scope.rows = tab.rows;
+          };
           rebuild = function() {
             var column, i, j, row, _i, _len, _ref, _results;
-            if (!scope.layout || !scope.layout.rows) {
+            if (!scope.rows) {
               return;
             }
-            _ref = scope.layout.rows;
+            _ref = scope.rows;
             _results = [];
             for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
               row = _ref[i];
@@ -1215,7 +1266,7 @@
             }
             return _results;
           };
-          scope.$watch('layout', function() {
+          scope.$watch('rows', function() {
             return rebuild();
           });
           return rebuild();
@@ -1251,7 +1302,7 @@
 
 (function() {
   'use strict';
-  angular.module('builder.directive', []).directive('builderShow', [
+  angular.module('builder.directive').directive('builderShow', [
     '$parse', function($parse) {
       return {
         restrict: 'A',
@@ -1337,7 +1388,7 @@
         show: (_ref6 = component.show) != null ? _ref6 : 'true',
         validation: (_ref7 = component.validation) != null ? _ref7 : '/.*/',
         validationOptions: (_ref8 = component.validationOptions) != null ? _ref8 : [],
-        someOptions: (_ref9 = component.someOptions) != null ? _ref9 : {},
+        someObject: (_ref9 = component.someObject) != null ? _ref9 : {},
         options: (_ref10 = component.options) != null ? _ref10 : [],
         arrayToText: (_ref11 = component.arrayToText) != null ? _ref11 : false,
         template: component.template,
@@ -1372,7 +1423,7 @@
         description: (_ref3 = formObject.description) != null ? _ref3 : component.description,
         placeholder: (_ref4 = formObject.placeholder) != null ? _ref4 : component.placeholder,
         options: (_ref5 = formObject.options) != null ? _ref5 : component.options,
-        someOptions: (_ref6 = formObject.someOptions) != null ? _ref6 : {},
+        someObject: (_ref6 = formObject.someObject) != null ? _ref6 : angular.copy(component.someObject),
         required: (_ref7 = formObject.required) != null ? _ref7 : component.required,
         show: (_ref8 = formObject.show) != null ? _ref8 : component.show,
         validation: (_ref9 = formObject.validation) != null ? _ref9 : component.validation
