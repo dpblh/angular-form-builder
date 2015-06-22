@@ -9,7 +9,7 @@ angular.module 'builder.components', ['form', 'validator.rules']
     rulesProvider.register 'url', '[url, default]'
 
     $validatorProvider.register 'default',
-        validator: -> no
+        validator: -> yes
         error: ''
 
     # ----------------------------------------

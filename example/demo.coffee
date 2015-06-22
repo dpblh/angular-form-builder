@@ -79,18 +79,35 @@ angular.module 'app', ['builder', 'builder.components', 'validator.rules']
 
 #    $timeout( ->
     $scope.layout = {
-        "rows": [{
-            "label": "Персональные данные", "columns": [{
-                "width": 6, "formData": {
-                    "name": "example", "views": [{
-                        "id": "a1c5624a-a44d-c220-56f3-03d22828323d", "component": "checkbox", "show": "true", "editable": true, "index": 0, "label": "Checkbox", "description": "description", "placeholder": "placeholder", "options": ["value one",
-                                                                                                                                                                                                                          "value two"], "required": false, "validation": "/.*/", "modelName": "personal.data.lastName"
-                    },
-                        {"id": "ea1f2e51-4d37-4460-b67e-f0f32c9ea22e", "component": "textInput", "show": "true", "editable": true, "index": 1, "label": "Text Input", "description": "description", "placeholder": "placeholder", "options": [], "required": false, "validation": "[default]", "modelName": "personal.data.middleName"},
-                        {"id": "8e3e143c-40ea-e61d-e051-c81ce1be2ab1", "component": "check", "show": "true", "editable": true, "index": 2, "label": "Check", "description": "description", "placeholder": "placeholder", "options": [], "required": false, "validation": "/.*/", "modelName": "personal.data.eeee"}]
-                }
-            }]
-        }]
+        "tabs": [
+            {"label": 'main tab'
+            "rows": [{
+                "label": "Персональные данные", "columns": [{
+                    "width": 6, "formData": {
+                        "name": "example", "views": [{
+                            "id": "a1c5624a-a44d-c220-56f3-03d22828323d", "component": "checkbox", "show": "true", "editable": true, "index": 0, "label": "Checkbox", "description": "description", "placeholder": "placeholder", "options": ["value one",
+                                                                                                                                                                                                                                              "value two"], "required": false, "validation": "/.*/", "modelName": "personal.data.lastName"
+                        },
+                            {"id": "ea1f2e51-4d37-4460-b67e-f0f32c9ea22e", "component": "textInput", "show": "true", "editable": true, "index": 1, "label": "Text Input", "description": "description", "placeholder": "placeholder", "options": [], "required": false, "validation": "[default]", "modelName": "personal.data.middleName"},
+                            {"id": "8e3e143c-40ea-e61d-e051-c81ce1be2ab1", "component": "check", "show": "true", "editable": true, "index": 2, "label": "Check", "description": "description", "placeholder": "placeholder", "options": [], "required": false, "validation": "/.*/", "modelName": "personal.data.eeee"}]
+                    }
+                }]
+            }]},
+            {"label": 'sub tab'
+            "rows": [{
+                "label": "Персональные данные", "columns": [{
+                    "width": 6, "formData": {
+                        "name": "example", "views": [{
+                            "id": "a1c5624a-a44d-c220-56f3-03d22828323d", "component": "checkbox", "show": "true", "editable": true, "index": 0, "label": "Checkbox", "description": "description", "placeholder": "placeholder", "options": ["value one",
+                                                                                                                                                                                                                                              "value two"], "required": false, "validation": "/.*/", "modelName": "personal.data.lastName"
+                        },
+                            {"id": "ea1f2e51-4d37-4460-b67e-f0f32c9ea22e", "component": "textInput", "show": "true", "editable": true, "index": 1, "label": "Text Input", "description": "description", "placeholder": "placeholder", "options": [], "required": false, "validation": "[default]", "modelName": "personal.data.middleName"}]
+                    }
+                }]
+            }]}
+
+        ]
+
     }
 
 #    , 1000)
